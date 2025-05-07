@@ -20,14 +20,14 @@
 		<!--状态0：待处理 1：已同意 2：已拒绝 3:已拉黑-->
 		<result column="status" property="status"  />
 		<!--申请信息-->
-		<result column="apply-info" property="apply-info"  />
+		<result column="apply_info" property="applyInfo"  />
 	</resultMap>
 
 
 	<!-- 通用查询结果列-->
 	<sql id="base_column_list">
 		 u.apply_id,u.apply_user_id,u.receive_user_id,u.contact_type,u.contact_id,
-		 u.last_apply_time,u.status,u.apply-info
+		 u.last_apply_time,u.status,u.apply_info
 	</sql>
 
 	<sql id="base_condition_filed">
@@ -52,8 +52,8 @@
 			<if test="query.status != null">
 				 and  u.status = #{query.status}
 			</if>
-			<if test="query.apply-info != null and query.apply-info!=''">
-				 and  u.apply-info = #{query.apply-info}
+			<if test="query.applyInfo != null and query.applyInfo!=''">
+				 and  u.apply_info = #{query.applyInfo}
 			</if>
 	</sql>
 	<!-- 通用条件列-->
@@ -76,8 +76,8 @@
 			<if test="query.contactIdFuzzy!= null  and query.contactIdFuzzy!=''">
 				 and  u.contact_id like concat('%', #{query.contactIdFuzzy}, '%')
 			</if>
-			<if test="query.apply-infoFuzzy!= null  and query.apply-infoFuzzy!=''">
-				 and  u.apply-info like concat('%', #{query.apply-infoFuzzy}, '%')
+			<if test="query.applyInfoFuzzy!= null  and query.applyInfoFuzzy!=''">
+				 and  u.apply_info like concat('%', #{query.applyInfoFuzzy}, '%')
 			</if>
 	 </where>
 	</sql>
@@ -123,8 +123,8 @@
 			<if test="bean.status != null">
 				 status,
 			</if>
-			<if test="bean.apply-info != null">
-				 apply-info,
+			<if test="bean.applyInfo != null">
+				 apply_info,
 			</if>
 		 </trim>
 		 <trim prefix="values (" suffix=")" suffixOverrides="," >
@@ -149,8 +149,8 @@
 			<if test="bean.status!=null">
 				 #{bean.status},
 			</if>
-			<if test="bean.apply-info!=null">
-				 #{bean.apply-info},
+			<if test="bean.applyInfo!=null">
+				 #{bean.applyInfo},
 			</if>
 		 </trim>
 	</insert>
@@ -180,8 +180,8 @@
 			<if test="bean.status != null">
 				 status,
 			</if>
-			<if test="bean.apply-info != null">
-				 apply-info,
+			<if test="bean.applyInfo != null">
+				 apply_info,
 			</if>
 		 </trim>
 		 <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -206,8 +206,8 @@
 			<if test="bean.status!=null">
 				 #{bean.status},
 			</if>
-			<if test="bean.apply-info!=null">
-				 #{bean.apply-info},
+			<if test="bean.applyInfo!=null">
+				 #{bean.applyInfo},
 			</if>
 		 </trim>
 		 on DUPLICATE key update 
@@ -233,8 +233,8 @@
 			<if test="bean.status!=null">
 				 status = VALUES(status),
 			</if>
-			<if test="bean.apply-info!=null">
-				 apply-info = VALUES(apply-info),
+			<if test="bean.applyInfo!=null">
+				 apply_info = VALUES(apply_info),
 			</if>
 		 </trim>
 	</insert>
@@ -249,7 +249,7 @@
 			 contact_id,
 			 last_apply_time,
 			 status,
-			 apply-info
+			 apply_info
 		 )values
 		 <foreach collection="list" item="item" separator=",">
 			 (
@@ -260,7 +260,7 @@
 				 #{item.contactId},
 				 #{item.lastApplyTime},
 				 #{item.status},
-				 #{item.apply-info}
+				 #{item.applyInfo}
 			 )
 		 </foreach>
 	</insert>
@@ -275,7 +275,7 @@
 			 contact_id,
 			 last_apply_time,
 			 status,
-			 apply-info
+			 apply_info
 		 )values
 		 <foreach collection="list" item="item" separator=",">
 			 (
@@ -286,7 +286,7 @@
 				 #{item.contactId},
 				 #{item.lastApplyTime},
 				 #{item.status},
-				 #{item.apply-info}
+				 #{item.applyInfo}
 			 )
 		 </foreach>
 			on DUPLICATE key update 
@@ -297,7 +297,7 @@
 			contact_id = VALUES(contact_id),
 			last_apply_time = VALUES(last_apply_time),
 			status = VALUES(status),
-			apply-info = VALUES(apply-info)
+			apply_info = VALUES(apply_info)
 	</insert>
 
 	<!--多条件修改-->
@@ -325,8 +325,8 @@
 			<if test="bean.status != null">
 				 status = #{bean.status},
 			</if>
-			<if test="bean.apply-info != null">
-				 apply-info = #{bean.apply-info},
+			<if test="bean.applyInfo != null">
+				 apply_info = #{bean.applyInfo},
 			</if>
  		 </set>
  		 <include refid="query_condition" />
@@ -360,8 +360,8 @@
 			<if test="bean.status != null">
 				 status = #{bean.status},
 			</if>
-			<if test="bean.apply-info != null">
-				 apply-info = #{bean.apply-info},
+			<if test="bean.applyInfo != null">
+				 apply_info = #{bean.applyInfo},
 			</if>
  		 </set>
  		 where apply_id=#{applyId}

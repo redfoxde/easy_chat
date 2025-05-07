@@ -10,7 +10,7 @@
 		<!--群组名-->
 		<result column="group_name" property="groupName"  />
 		<!--群主id-->
-		<result column="group_ower_id" property="groupOwerId"  />
+		<result column="group_owner_id" property="groupOwnerId"  />
 		<!--创建时间-->
 		<result column="create_time" property="createTime"  />
 		<!--群公告-->
@@ -24,7 +24,7 @@
 
 	<!-- 通用查询结果列-->
 	<sql id="base_column_list">
-		 g.group_id,g.group_name,g.group_ower_id,g.create_time,g.group_notice,
+		 g.group_id,g.group_name,g.group_owner_id,g.create_time,g.group_notice,
 		 g.join_type,g.status
 	</sql>
 
@@ -35,8 +35,8 @@
 			<if test="query.groupName != null and query.groupName!=''">
 				 and  g.group_name = #{query.groupName}
 			</if>
-			<if test="query.groupOwerId != null and query.groupOwerId!=''">
-				 and  g.group_ower_id = #{query.groupOwerId}
+			<if test="query.groupOwnerId != null and query.groupOwnerId!=''">
+				 and  g.group_owner_id = #{query.groupOwnerId}
 			</if>
 			<if test="query.createTime != null and query.createTime!=''">
 				 <![CDATA[ and  g.create_time=str_to_date(#{query.createTime}, '%Y-%m-%d') ]]>
@@ -68,8 +68,8 @@
 			<if test="query.groupNameFuzzy!= null  and query.groupNameFuzzy!=''">
 				 and  g.group_name like concat('%', #{query.groupNameFuzzy}, '%')
 			</if>
-			<if test="query.groupOwerIdFuzzy!= null  and query.groupOwerIdFuzzy!=''">
-				 and  g.group_ower_id like concat('%', #{query.groupOwerIdFuzzy}, '%')
+			<if test="query.groupOwnerIdFuzzy!= null  and query.groupOwnerIdFuzzy!=''">
+				 and  g.group_owner_id like concat('%', #{query.groupOwnerIdFuzzy}, '%')
 			</if>
 			<if test="query.createTimeStart!= null and query.createTimeStart!=''">
 				 <![CDATA[ and  g.create_time>=str_to_date(#{query.createTimeStart}, '%Y-%m-%d') ]]>
@@ -109,8 +109,8 @@
 			<if test="bean.groupName != null">
 				 group_name,
 			</if>
-			<if test="bean.groupOwerId != null">
-				 group_ower_id,
+			<if test="bean.groupOwnerId != null">
+				 group_owner_id,
 			</if>
 			<if test="bean.createTime != null">
 				 create_time,
@@ -132,8 +132,8 @@
 			<if test="bean.groupName!=null">
 				 #{bean.groupName},
 			</if>
-			<if test="bean.groupOwerId!=null">
-				 #{bean.groupOwerId},
+			<if test="bean.groupOwnerId!=null">
+				 #{bean.groupOwnerId},
 			</if>
 			<if test="bean.createTime!=null">
 				 #{bean.createTime},
@@ -160,8 +160,8 @@
 			<if test="bean.groupName != null">
 				 group_name,
 			</if>
-			<if test="bean.groupOwerId != null">
-				 group_ower_id,
+			<if test="bean.groupOwnerId != null">
+				 group_owner_id,
 			</if>
 			<if test="bean.createTime != null">
 				 create_time,
@@ -183,8 +183,8 @@
 			<if test="bean.groupName!=null">
 				 #{bean.groupName},
 			</if>
-			<if test="bean.groupOwerId!=null">
-				 #{bean.groupOwerId},
+			<if test="bean.groupOwnerId!=null">
+				 #{bean.groupOwnerId},
 			</if>
 			<if test="bean.createTime!=null">
 				 #{bean.createTime},
@@ -207,8 +207,8 @@
 			<if test="bean.groupName!=null">
 				 group_name = VALUES(group_name),
 			</if>
-			<if test="bean.groupOwerId!=null">
-				 group_ower_id = VALUES(group_ower_id),
+			<if test="bean.groupOwnerId!=null">
+				 group_owner_id = VALUES(group_owner_id),
 			</if>
 			<if test="bean.createTime!=null">
 				 create_time = VALUES(create_time),
@@ -230,7 +230,7 @@
 		 INSERT INTO group_info(
 			 group_id,
 			 group_name,
-			 group_ower_id,
+			 group_owner_id,
 			 create_time,
 			 group_notice,
 			 join_type,
@@ -240,7 +240,7 @@
 			 (
 				 #{item.groupId},
 				 #{item.groupName},
-				 #{item.groupOwerId},
+				 #{item.groupOwnerId},
 				 #{item.createTime},
 				 #{item.groupNotice},
 				 #{item.joinType},
@@ -254,7 +254,7 @@
 		 INSERT INTO group_info(
 			 group_id,
 			 group_name,
-			 group_ower_id,
+			 group_owner_id,
 			 create_time,
 			 group_notice,
 			 join_type,
@@ -264,7 +264,7 @@
 			 (
 				 #{item.groupId},
 				 #{item.groupName},
-				 #{item.groupOwerId},
+				 #{item.groupOwnerId},
 				 #{item.createTime},
 				 #{item.groupNotice},
 				 #{item.joinType},
@@ -274,7 +274,7 @@
 			on DUPLICATE key update 
 			group_id = VALUES(group_id),
 			group_name = VALUES(group_name),
-			group_ower_id = VALUES(group_ower_id),
+			group_owner_id = VALUES(group_owner_id),
 			create_time = VALUES(create_time),
 			group_notice = VALUES(group_notice),
 			join_type = VALUES(join_type),
@@ -291,8 +291,8 @@
 			<if test="bean.groupName != null">
 				 group_name = #{bean.groupName},
 			</if>
-			<if test="bean.groupOwerId != null">
-				 group_ower_id = #{bean.groupOwerId},
+			<if test="bean.groupOwnerId != null">
+				 group_owner_id = #{bean.groupOwnerId},
 			</if>
 			<if test="bean.createTime != null">
 				 create_time = #{bean.createTime},
@@ -323,8 +323,8 @@
 			<if test="bean.groupName != null">
 				 group_name = #{bean.groupName},
 			</if>
-			<if test="bean.groupOwerId != null">
-				 group_ower_id = #{bean.groupOwerId},
+			<if test="bean.groupOwnerId != null">
+				 group_owner_id = #{bean.groupOwnerId},
 			</if>
 			<if test="bean.createTime != null">
 				 create_time = #{bean.createTime},
