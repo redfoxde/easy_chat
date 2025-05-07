@@ -1,6 +1,5 @@
 package com.easychat.entity.po;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 
 
@@ -117,6 +116,6 @@ public class UserContactApply implements Serializable {
 
 	@Override
 	public String toString (){
-		return "自增ID:"+(applyId == null ? "空" : applyId)+"，申请人ID:"+(applyUserId == null ? "空" : applyUserId)+"，接收人ID:"+(receiveUserId == null ? "空" : receiveUserId)+"，联系人类型 0：好友 1：数组:"+(contactType == null ? "空" : contactType)+"，联系人群组ID:"+(contactId == null ? "空" : contactId)+"，最后群组ID:"+(lastApplyTime == null ? "空" : lastApplyTime)+"，状态0：待处理 1：已同意 2：已拒绝 3:已拉黑:"+(status == null ? "空" : status)+"，申请信息:"+(apply-info == null ? "空" : apply-info);
+		return "自增ID:"+(applyId == null ? "空" : applyId)+"，申请人ID:"+(applyUserId == null ? "空" : applyUserId)+"，接收人ID:"+(receiveUserId == null ? "空" : receiveUserId)+"，联系人类型 0：好友 1：数组:"+(contactType == null ? "空" : contactType)+"，联系人群组ID:"+(contactId == null ? "空" : contactId)+"，最后群组ID:"+(lastApplyTime == null ? "空" : lastApplyTime)+"，状态0：待处理 1：已同意 2：已拒绝 3:已拉黑:"+(status == null ? "空" : status)+"，申请信息:"+(apply_info == null ? "空" : apply_info);
 	}
 }
