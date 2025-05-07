@@ -1,7 +1,13 @@
 package com.easychat.controller;
+import com.easychat.entity.constants.constants;
+import com.easychat.entity.dto.TokenUserInfoDto;
 import com.easychat.entity.enums.ResponseCodeEnum;
 import com.easychat.exception.BusinessException;
 import com.easychat.entity.vo.ResponseVO;
+import com.easychat.redis.RedisUtils;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 
 
 public class ABaseController {
@@ -9,6 +15,9 @@ public class ABaseController {
     protected static final String STATUC_SUCCESS = "success";
 
     protected static final String STATUC_ERROR = "error";
+
+    @Resource
+    private RedisUtils redisUtils;
 
     protected <T> ResponseVO getSuccessResponseVO(T t) {
         ResponseVO<T> responseVO = new ResponseVO<>();
@@ -39,5 +48,11 @@ public class ABaseController {
         vo.setInfo(ResponseCodeEnum.CODE_500.getMsg());
         vo.setData(t);
         return vo;
+    }
+
+    protected TokenUserInfoDto getTokenUserInfoDto(HttpServletRequest request) {
+        String token = request.getHeader("token");
+        TokenUserInfoDto tokenUserInfoDto =(TokenUserInfoDto) redisUtils.get(constants.REDIS_WS_TOKEN+token);
+        return tokenUserInfoDto;
     }
 }

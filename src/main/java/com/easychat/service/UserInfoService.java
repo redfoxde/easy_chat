@@ -7,6 +7,7 @@ import com.easychat.entity.dto.TokenUserInfoDto;
 import com.easychat.entity.query.UserInfoQuery;
 import com.easychat.entity.po.UserInfo;
 import com.easychat.entity.vo.PaginationResultVO;
+import com.easychat.entity.vo.UserInfoVO;
 
 
 /**
@@ -97,5 +98,5 @@ public interface UserInfoService {
 	/**
 	 *登录
 	 */
-	TokenUserInfoDto login(String email, String password);
+	UserInfoVO login(String email, String password);
 }

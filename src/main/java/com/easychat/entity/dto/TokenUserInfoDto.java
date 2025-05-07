@@ -21,6 +21,9 @@ public class TokenUserInfoDto implements Serializable {
     public void setToken(String token) {
         this.token = token;
     }
+    public String getToken() {
+        return token;
+    }
     public String getUserId() {
         return userId;
     }
@@ -32,5 +35,8 @@ public class TokenUserInfoDto implements Serializable {
     }
     public void setIsAdmin(Boolean isAdmin) {
         this.isAdmin = isAdmin;
+    }
+    public Boolean getIsAdmin() {
+        return isAdmin;
     }
 }

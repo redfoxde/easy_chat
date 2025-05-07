@@ -10,15 +10,14 @@ import javax.annotation.Resource;
 import com.easychat.entity.config.AppConfig;
 import com.easychat.entity.constants.constants;
 import com.easychat.entity.dto.TokenUserInfoDto;
-import com.easychat.entity.enums.BeautyAccountStatusEnum;
-import com.easychat.entity.enums.PageSize;
-import com.easychat.entity.enums.UserContactTypeEnum;
-import com.easychat.entity.enums.UserStatusEnum;
+import com.easychat.entity.enums.*;
 import com.easychat.entity.po.UserInfoBeauty;
 import com.easychat.entity.query.SimplePage;
+import com.easychat.entity.vo.UserInfoVO;
 import com.easychat.exception.BusinessException;
 import com.easychat.mappers.UserInfoBeautyMapper;
 import com.easychat.redis.RedisComponent;
+import com.easychat.utils.CopyTools;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.ibatis.reflection.ArrayUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +29,7 @@ import com.easychat.entity.vo.PaginationResultVO;
 import com.easychat.mappers.UserInfoMapper;
 import com.easychat.service.UserInfoService;
 import com.easychat.utils.StringTools;
+import org.springframework.transaction.annotation.Transactional;
 
 
 /**
@@ -180,6 +180,7 @@ public class UserInfoServiceImpl implements UserInfoService {
 	 * 注册
 	 */
 	@Override
+	@Transactional(rollbackFor = Exception.class)
 	public void register(String email, String nickName, String password) {
 		UserInfo userInfo = this.userInfoMapper.selectByEmail(email);
 		if(null!=userInfo) {
@@ -200,8 +201,9 @@ public class UserInfoServiceImpl implements UserInfoService {
 			userInfo.setEmail(email);
 			userInfo.setCreatTime(curDate);
 			//TODO 创建用户状态枚举类
-			userInfo.setStatus(UserStatusEnum.ENABLE);
+			userInfo.setStatus(UserStatusEnum.ENABLE.getStatus());
 			userInfo.setLastOffTime(curDate.getTime());
+			userInfo.setJoinType(JoinTypeEnum.APPLY.getType());
 			this.userInfoMapper.insert(userInfo);
 
 			if(UseBeautyAccount){
@@ -215,7 +217,7 @@ public class UserInfoServiceImpl implements UserInfoService {
 	/**
 	 *登录
 	 */
-	public TokenUserInfoDto login(String email, String password){
+	public UserInfoVO login(String email, String password){
 		UserInfo userInfo = this.userInfoMapper.selectByEmail(email);
 
 		if(null==userInfo||!userInfo.getPassword().equals(StringTools.encodeMd5(password))) {
@@ -233,15 +235,20 @@ public class UserInfoServiceImpl implements UserInfoService {
 
 		//TODO 查询我的群组
 		//TODO 查询我的联系人
-		TokenUserInfoDto tokenInfoDto=getTokenUserInfoDto(userInfo);
+		TokenUserInfoDto tokenUserInfoDto=getTokenUserInfoDto(userInfo);
 
-		String token = StringTools.encodeMd5(tokenInfoDto.getUserId()+StringTools.getRandomString(constants.Length_20));
+		//保存信息到redis中
+		String token = StringTools.encodeMd5(tokenUserInfoDto.getUserId()+StringTools.getRandomString(constants.Length_20));
+		tokenUserInfoDto.setToken(token);
+		redisComponent.saveTokenUserInfoDto(tokenUserInfoDto);
 
-		tokenInfoDto.setToken(token);
+
+		UserInfoVO userInfoVO = CopyTools.copy(userInfo,UserInfoVO.class);
+		userInfoVO.setToken(tokenUserInfoDto.getToken());
+		userInfoVO.setAdmin(tokenUserInfoDto.getIsAdmin());
 
 
-
-        return tokenInfoDto;
+		return userInfoVO;
     }
 
 

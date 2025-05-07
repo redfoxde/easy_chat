@@ -7,6 +7,36 @@ package com.easychat.entity.enums;
  * @mood happy
  */
 public enum UserStatusEnum {
-    ENABLE, DISABLE;
+    DISABLE(0,"账号已禁用"),
+    ENABLE(1,"账户已存在");
+
+    private Integer status;
+    private String desc;
+
+    UserStatusEnum(Integer status, String desc) {
+        this.status = status;
+        this.desc = desc;
+    }
+
+    public static UserStatusEnum getUserStatusEnum(Integer status) {
+        for (UserStatusEnum item : UserStatusEnum.values()) {
+            if (item.status.equals(status)) {
+                return item;
+            }
+        }
+        return null;
+    }
+    public Integer getStatus() {
+        return status;
+    }
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+    public String getDesc() {
+        return desc;
+    }
+    public void setDesc(String desc) {
+        this.desc = desc;
+    }
 
 }
