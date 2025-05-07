@@ -1,4 +1,4 @@
-package com.easychat.test.entity.query;
+package com.easychat.entity.query;
 
 import java.util.Date;
 

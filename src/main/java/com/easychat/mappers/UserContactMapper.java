@@ -1,4 +1,4 @@
-package com.easychat.test.mappers;
+package com.easychat.mappers;
 
 import org.apache.ibatis.annotations.Param;
 

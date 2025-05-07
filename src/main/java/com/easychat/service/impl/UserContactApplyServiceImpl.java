@@ -1,19 +1,21 @@
-package com.easychat.test.service.impl;
+package com.easychat.service.impl;
 
-import java.util.List;
+
 
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
-import com.easychat.test.entity.enums.PageSize;
-import com.easychat.test.entity.query.UserContactApplyQuery;
-import com.easychat.test.entity.po.UserContactApply;
-import com.easychat.test.entity.vo.PaginationResultVO;
-import com.easychat.test.entity.query.SimplePage;
-import com.easychat.test.mappers.UserContactApplyMapper;
-import com.easychat.test.service.UserContactApplyService;
-import com.easychat.test.utils.StringTools;
+import com.easychat.entity.enums.PageSize;
+import com.easychat.entity.query.UserContactApplyQuery;
+import com.easychat.entity.po.UserContactApply;
+import com.easychat.entity.vo.PaginationResultVO;
+import com.easychat.entity.query.SimplePage;
+import com.easychat.mappers.UserContactApplyMapper;
+import com.easychat.service.UserContactApplyService;
+import com.easychat.utils.StringTools;
+
+import java.util.List;
 
 
 /**

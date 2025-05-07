@@ -1,4 +1,4 @@
-package com.easychat.test.entity.po;
+package com.easychat.entity.po;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
@@ -48,7 +48,7 @@ public class UserContactApply implements Serializable {
 	/**
 	 * 申请信息
 	 */
-	private String apply-info;
+	private String apply_info;
 
 
 	public void setApplyId(Integer applyId){
@@ -107,12 +107,12 @@ public class UserContactApply implements Serializable {
 		return this.status;
 	}
 
-	public void setApply-info(String apply-info){
-		this.apply-info = apply-info;
+	public void setApply_info(String apply_info){
+		this.apply_info = apply_info;
 	}
 
-	public String getApply-info(){
-		return this.apply-info;
+	public String getApply_info(){
+		return this.apply_info;
 	}
 
 	@Override

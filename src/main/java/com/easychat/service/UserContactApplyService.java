@@ -1,10 +1,10 @@
-package com.easychat.test.service;
+package com.easychat.service;
 
 import java.util.List;
 
-import com.easychat.test.entity.query.UserContactApplyQuery;
-import com.easychat.test.entity.po.UserContactApply;
-import com.easychat.test.entity.vo.PaginationResultVO;
+import com.easychat.entity.query.UserContactApplyQuery;
+import com.easychat.entity.po.UserContactApply;
+import com.easychat.entity.vo.PaginationResultVO;
 
 
 /**

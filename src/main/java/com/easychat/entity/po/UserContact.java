@@ -1,9 +1,9 @@
-package com.easychat.test.entity.po;
+package com.easychat.entity.po;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.Date;
-import com.easychat.test.entity.enums.DateTimePatternEnum;
-import com.easychat.test.utils.DateUtil;
+import com.easychat.entity.enums.DateTimePatternEnum;
+import com.easychat.utils.DateUtil;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.format.annotation.DateTimeFormat;
 

@@ -1,4 +1,4 @@
-package com.easychat.test.entity.query;
+package com.easychat.entity.query;
 
 import java.util.Date;
 
@@ -26,9 +26,9 @@ public class GroupInfoQuery extends BaseParam {
 	/**
 	 * 群主id
 	 */
-	private String groupOwerId;
+	private String groupOwnerId;
 
-	private String groupOwerIdFuzzy;
+	private String groupOwnerIdFuzzy;
 
 	/**
 	 * 创建时间
@@ -89,20 +89,20 @@ public class GroupInfoQuery extends BaseParam {
 		return this.groupNameFuzzy;
 	}
 
-	public void setGroupOwerId(String groupOwerId){
-		this.groupOwerId = groupOwerId;
+	public void setGroupOwnerId(String groupOwnerId){
+		this.groupOwnerId = groupOwnerId;
 	}
 
-	public String getGroupOwerId(){
-		return this.groupOwerId;
+	public String getGroupOwnerId(){
+		return this.groupOwnerId;
 	}
 
-	public void setGroupOwerIdFuzzy(String groupOwerIdFuzzy){
-		this.groupOwerIdFuzzy = groupOwerIdFuzzy;
+	public void setGroupOwnerIdFuzzy(String groupOwnerIdFuzzy){
+		this.groupOwnerIdFuzzy = groupOwnerIdFuzzy;
 	}
 
-	public String getGroupOwerIdFuzzy(){
-		return this.groupOwerIdFuzzy;
+	public String getGroupOwnerIdFuzzy(){
+		return this.groupOwnerIdFuzzy;
 	}
 
 	public void setCreateTime(String createTime){

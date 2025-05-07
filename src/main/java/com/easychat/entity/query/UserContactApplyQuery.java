@@ -1,4 +1,4 @@
-package com.easychat.test.entity.query;
+package com.easychat.entity.query;
 
 
 
@@ -52,9 +52,9 @@ public class UserContactApplyQuery extends BaseParam {
 	/**
 	 * 申请信息
 	 */
-	private String apply-info;
+	private String apply_info;
 
-	private String apply-infoFuzzy;
+	private String apply_infoFuzzy;
 
 
 	public void setApplyId(Integer applyId){
@@ -137,20 +137,20 @@ public class UserContactApplyQuery extends BaseParam {
 		return this.status;
 	}
 
-	public void setApply-info(String apply-info){
-		this.apply-info = apply-info;
+	public void setApply_info(String apply_info){
+		this.apply_info = apply_info;
 	}
 
-	public String getApply-info(){
-		return this.apply-info;
+	public String getApply_info(){
+		return this.apply_info;
 	}
 
-	public void setApply-infoFuzzy(String apply-infoFuzzy){
-		this.apply-infoFuzzy = apply-infoFuzzy;
+	public void setApply_infoFuzzy(String apply_infoFuzzy){
+		this.apply_infoFuzzy = apply_infoFuzzy;
 	}
 
-	public String getApply-infoFuzzy(){
-		return this.apply-infoFuzzy;
+	public String getApply_infoFuzzy(){
+		return this.apply_infoFuzzy;
 	}
 
 }
