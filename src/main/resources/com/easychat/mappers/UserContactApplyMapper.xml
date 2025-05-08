@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.easychat.test.mappers.UserContactApplyMapper">
+<mapper namespace="com.easychat.mappers.UserContactApplyMapper">
 
 	<!--实体映射-->
-	<resultMap id="base_result_map" type="com.easychat.test.entity.po.UserContactApply">
+	<resultMap id="base_result_map" type="com.easychat.entity.po.UserContactApply">
 		<!--自增ID-->
 		<result column="apply_id" property="applyId"  />
 		<!--申请人ID-->
@@ -99,7 +99,7 @@
 	</select>
 
 	<!-- 插入 （匹配有值的字段）-->
-	<insert id="insert" parameterType="com.easychat.test.entity.po.UserContactApply">
+	<insert id="insert" parameterType="com.easychat.entity.po.UserContactApply">
 		 INSERT INTO user_contact_apply
 		 <trim prefix="(" suffix=")" suffixOverrides="," >
 			<if test="bean.applyId != null">
@@ -156,7 +156,7 @@
 	</insert>
 
 	<!-- 插入或者更新 （匹配有值的字段）-->
-	<insert id="insertOrUpdate" parameterType="com.easychat.test.entity.po.UserContactApply">
+	<insert id="insertOrUpdate" parameterType="com.easychat.entity.po.UserContactApply">
 		 INSERT INTO user_contact_apply
 		 <trim prefix="(" suffix=")" suffixOverrides=",">
 			<if test="bean.applyId != null">
@@ -240,7 +240,7 @@
 	</insert>
 
 	<!-- 添加 （批量插入）-->
-	<insert id="insertBatch" parameterType="com.easychat.test.entity.po.UserContactApply">
+	<insert id="insertBatch" parameterType="com.easychat.entity.po.UserContactApply">
 		 INSERT INTO user_contact_apply(
 			 apply_id,
 			 apply_user_id,
@@ -266,7 +266,7 @@
 	</insert>
 
 	<!-- 批量新增修改 （批量插入）-->
-	<insert id="insertOrUpdateBatch" parameterType="com.easychat.test.entity.po.UserContactApply">
+	<insert id="insertOrUpdateBatch" parameterType="com.easychat.entity.po.UserContactApply">
 		 INSERT INTO user_contact_apply(
 			 apply_id,
 			 apply_user_id,
@@ -301,7 +301,7 @@
 	</insert>
 
 	<!--多条件修改-->
-	<update id="updateByParam" parameterType="com.easychat.test.entity.query.UserContactApplyQuery">
+	<update id="updateByParam" parameterType="com.easychat.entity.query.UserContactApplyQuery">
 		 UPDATE user_contact_apply u
  		 <set> 
 			<if test="bean.applyId != null">
@@ -339,7 +339,7 @@
 	</delete>
 
 	<!-- 根据ApplyId修改-->
-	<update id="updateByApplyId" parameterType="com.easychat.test.entity.po.UserContactApply">
+	<update id="updateByApplyId" parameterType="com.easychat.entity.po.UserContactApply">
 		 UPDATE user_contact_apply
  		 <set> 
 			<if test="bean.applyUserId != null">

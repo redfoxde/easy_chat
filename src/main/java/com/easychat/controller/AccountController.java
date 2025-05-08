@@ -1,5 +1,6 @@
 package com.easychat.controller;
 
+import com.easychat.annotation.GlobalInterceptor;
 import com.easychat.entity.constants.constants;
 import com.easychat.entity.dto.TokenUserInfoDto;
 import com.easychat.entity.po.UserInfo;
@@ -102,6 +103,7 @@ public class AccountController extends ABaseController{
 
     }
 
+    @GlobalInterceptor
     @RequestMapping("/getSysSetting")
     public ResponseVO login() {
         return getSuccessResponseVO(redisComponent.getSysSettingDto());

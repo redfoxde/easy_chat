@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.easychat.test.mappers.GroupInfoMapper">
+<mapper namespace="com.easychat.mappers.GroupInfoMapper">
 
 	<!--实体映射-->
-	<resultMap id="base_result_map" type="com.easychat.test.entity.po.GroupInfo">
+	<resultMap id="base_result_map" type="com.easychat.entity.po.GroupInfo">
 		<!--群ID-->
 		<result column="group_id" property="groupId"  />
 		<!--群组名-->
@@ -100,7 +100,7 @@
 	</select>
 
 	<!-- 插入 （匹配有值的字段）-->
-	<insert id="insert" parameterType="com.easychat.test.entity.po.GroupInfo">
+	<insert id="insert" parameterType="com.easychat.entity.po.GroupInfo">
 		 INSERT INTO group_info
 		 <trim prefix="(" suffix=")" suffixOverrides="," >
 			<if test="bean.groupId != null">
@@ -151,7 +151,7 @@
 	</insert>
 
 	<!-- 插入或者更新 （匹配有值的字段）-->
-	<insert id="insertOrUpdate" parameterType="com.easychat.test.entity.po.GroupInfo">
+	<insert id="insertOrUpdate" parameterType="com.easychat.entity.po.GroupInfo">
 		 INSERT INTO group_info
 		 <trim prefix="(" suffix=")" suffixOverrides=",">
 			<if test="bean.groupId != null">
@@ -226,7 +226,7 @@
 	</insert>
 
 	<!-- 添加 （批量插入）-->
-	<insert id="insertBatch" parameterType="com.easychat.test.entity.po.GroupInfo">
+	<insert id="insertBatch" parameterType="com.easychat.entity.po.GroupInfo">
 		 INSERT INTO group_info(
 			 group_id,
 			 group_name,
@@ -250,7 +250,7 @@
 	</insert>
 
 	<!-- 批量新增修改 （批量插入）-->
-	<insert id="insertOrUpdateBatch" parameterType="com.easychat.test.entity.po.GroupInfo">
+	<insert id="insertOrUpdateBatch" parameterType="com.easychat.entity.po.GroupInfo">
 		 INSERT INTO group_info(
 			 group_id,
 			 group_name,
@@ -282,7 +282,7 @@
 	</insert>
 
 	<!--多条件修改-->
-	<update id="updateByParam" parameterType="com.easychat.test.entity.query.GroupInfoQuery">
+	<update id="updateByParam" parameterType="com.easychat.entity.query.GroupInfoQuery">
 		 UPDATE group_info g
  		 <set> 
 			<if test="bean.groupId != null">
@@ -317,7 +317,7 @@
 	</delete>
 
 	<!-- 根据GroupId修改-->
-	<update id="updateByGroupId" parameterType="com.easychat.test.entity.po.GroupInfo">
+	<update id="updateByGroupId" parameterType="com.easychat.entity.po.GroupInfo">
 		 UPDATE group_info
  		 <set> 
 			<if test="bean.groupName != null">

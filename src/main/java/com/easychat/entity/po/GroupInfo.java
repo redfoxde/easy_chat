@@ -28,7 +28,7 @@ public class GroupInfo implements Serializable {
 	/**
 	 * 群主id
 	 */
-	private String groupOwerId;
+	private String groupOwnerId;
 
 	/**
 	 * 创建时间
@@ -52,6 +52,7 @@ public class GroupInfo implements Serializable {
 	 */
 	private Integer status;
 
+	private Integer memberCount;
 
 	public void setGroupId(String groupId){
 		this.groupId = groupId;
@@ -69,12 +70,12 @@ public class GroupInfo implements Serializable {
 		return this.groupName;
 	}
 
-	public void setGroupOwerId(String groupOwerId){
-		this.groupOwerId = groupOwerId;
+	public void setGroupOwnerId(String groupOwnerId){
+		this.groupOwnerId = groupOwnerId;
 	}
 
-	public String getGroupOwerId(){
-		return this.groupOwerId;
+	public String getGroupOwnerId(){
+		return this.groupOwnerId;
 	}
 
 	public void setCreateTime(Date createTime){
@@ -109,8 +110,15 @@ public class GroupInfo implements Serializable {
 		return this.status;
 	}
 
+	public void setMemberCount(Integer memberCount){
+		this.memberCount = memberCount;
+	}
+	public Integer getMemberCount(){
+		return this.memberCount;
+	}
+
 	@Override
 	public String toString (){
-		return "群ID:"+(groupId == null ? "空" : groupId)+"，群组名:"+(groupName == null ? "空" : groupName)+"，群主id:"+(groupOwerId == null ? "空" : groupOwerId)+"，创建时间:"+(createTime == null ? "空" : DateUtil.format(createTime, DateTimePatternEnum.YYYY_MM_DD_HH_MM_SS.getPattern()))+"，群公告:"+(groupNotice == null ? "空" : groupNotice)+"，0：直接加入，1：管理员同意后加入:"+(joinType == null ? "空" : joinType)+"，状态 1：正常 0：解散:"+(status == null ? "空" : status);
+		return "群ID:"+(groupId == null ? "空" : groupId)+"，群组名:"+(groupName == null ? "空" : groupName)+"，群主id:"+(groupOwnerId == null ? "空" : groupOwnerId)+"，创建时间:"+(createTime == null ? "空" : DateUtil.format(createTime, DateTimePatternEnum.YYYY_MM_DD_HH_MM_SS.getPattern()))+"，群公告:"+(groupNotice == null ? "空" : groupNotice)+"，0：直接加入，1：管理员同意后加入:"+(joinType == null ? "空" : joinType)+"，状态 1：正常 0：解散:"+(status == null ? "空" : status);
 	}
 }

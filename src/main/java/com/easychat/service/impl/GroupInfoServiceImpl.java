@@ -1,9 +1,24 @@
 package com.easychat.service.impl;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Resource;
 
+
+import com.easychat.entity.config.AppConfig;
+import com.easychat.entity.constants.constants;
+import com.easychat.entity.dto.SysSettingDto;
+import com.easychat.entity.enums.ResponseCodeEnum;
+import com.easychat.entity.enums.UserContactStatusEnum;
+import com.easychat.entity.enums.UserContactTypeEnum;
+import com.easychat.entity.po.UserContact;
+import com.easychat.entity.query.UserContactQuery;
+import com.easychat.exception.BusinessException;
+import com.easychat.mappers.UserContactMapper;
+import com.easychat.redis.RedisComponent;
 import org.springframework.stereotype.Service;
 
 import com.easychat.entity.enums.PageSize;
@@ -14,6 +29,8 @@ import com.easychat.entity.query.SimplePage;
 import com.easychat.mappers.GroupInfoMapper;
 import com.easychat.service.GroupInfoService;
 import com.easychat.utils.StringTools;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 
 /**
@@ -24,6 +41,15 @@ public class GroupInfoServiceImpl implements GroupInfoService {
 
 	@Resource
 	private GroupInfoMapper<GroupInfo, GroupInfoQuery> groupInfoMapper;
+
+	@Resource
+	public RedisComponent redisComponent;
+
+	@Resource
+	private UserContactMapper<UserContact, UserContactQuery> userContactMapper;
+
+	@Resource
+	private AppConfig appConfig;
 
 	/**
 	 * 根据条件查询列表
@@ -126,5 +152,70 @@ public class GroupInfoServiceImpl implements GroupInfoService {
 	@Override
 	public Integer deleteGroupInfoByGroupId(String groupId) {
 		return this.groupInfoMapper.deleteByGroupId(groupId);
+	}
+
+	/**
+	 * 创建群组
+	 */
+	@Override
+	//事务
+	@Transactional(rollbackFor = Exception.class)
+	public void saveGroup(GroupInfo groupInfo, MultipartFile avatarFile, MultipartFile avatarCover) throws IOException {
+		Date curDate = new Date();
+		//新增
+		if(StringTools.isEmpty(groupInfo.getGroupId())){
+			GroupInfoQuery groupInfoQuery = new GroupInfoQuery();
+			groupInfoQuery.setGroupOwnerId(groupInfo.getGroupOwnerId());
+			//统计创建的群聊数目
+			Integer count = this.groupInfoMapper.selectCount(groupInfoQuery);
+			SysSettingDto sysSettingDto = redisComponent.getSysSettingDto();
+			if (count>sysSettingDto.getMaxGroupCount()){
+				throw new BusinessException("最多只能创建"+sysSettingDto.getMaxGroupCount()+"个群聊");
+			}
+			if (null == avatarFile){
+				throw new BusinessException(ResponseCodeEnum.CODE_600);
+			}
+			groupInfo.setCreateTime(curDate);
+			groupInfo.setGroupId(StringTools.getGroupId());
+			this.groupInfoMapper.insert(groupInfo);
+
+			//将群组添加为联系人
+			UserContact userContact = new UserContact();
+			userContact.setStatus(UserContactStatusEnum.FRIEND.getStatus());
+			userContact.setContactType(UserContactTypeEnum.GROUP.getType());
+			userContact.setContactId(groupInfo.getGroupId());
+			userContact.setUserId(groupInfo.getGroupOwnerId());
+			userContact.setCreateTime(curDate);
+			userContact.setLastUpdateTime(curDate);
+			this.userContactMapper.insert(userContact);
+
+			//TODO 创建会话
+			//TODO 发送消息
+
+		}else{
+			//修改
+			GroupInfo dbGroupInfo = this.groupInfoMapper.selectByGroupId(groupInfo.getGroupId());
+			//避免绕过客户端进行修改
+			if(!dbGroupInfo.getGroupOwnerId().equals(groupInfo.getGroupOwnerId())){
+				throw new BusinessException(ResponseCodeEnum.CODE_600);
+			}
+			this.groupInfoMapper.updateByGroupId(groupInfo,groupInfo.getGroupId());
+			//TODO 更新相关表冗余信息
+
+			//TODO 修改群昵称发送WS昵称
+		}
+		//头像
+		if(null == avatarFile){
+			return;
+		}
+		String baseFolder = appConfig.getProjectFolder()+ constants.FILE_FOLDER_FILE;
+		File targetFileFolder = new File(baseFolder+constants.FILE_FOLDER_AVATAR_NAME);
+		if(!targetFileFolder.exists()){
+			targetFileFolder.mkdirs();
+		}
+		String filePath = targetFileFolder+"/"+groupInfo.getGroupId()+constants.IMAGE_SUFFIX;
+		avatarFile.transferTo(new File(filePath));
+		avatarCover.transferTo(new File(filePath+constants.COVER_IMAGE_SUFFIX));
+
 	}
 }

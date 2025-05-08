@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.easychat.test.mappers.UserContactMapper">
+<mapper namespace="com.easychat.mappers.UserContactMapper">
 
 	<!--实体映射-->
-	<resultMap id="base_result_map" type="com.easychat.test.entity.po.UserContact">
+	<resultMap id="base_result_map" type="com.easychat.entity.po.UserContact">
 		<!--用户ID-->
 		<result column="user_id" property="userId"  />
 		<!--联系人ID或群组ID-->
@@ -58,7 +58,7 @@
 	 <where>
 			<include refid="base_condition_filed" />
 			<if test="query.userIdFuzzy!= null  and query.userIdFuzzy!=''">
-				 and  u.user_id like concat('%', #{query.userIdFuzzy}, '%')
+				 and  c.user_id like concat('%', #{query.userIdFuzzy}, '%')
 			</if>
 			<if test="query.contactIdFuzzy!= null  and query.contactIdFuzzy!=''">
 				 and  u.contact_id like concat('%', #{query.contactIdFuzzy}, '%')
@@ -80,7 +80,15 @@
 
 	<!-- 查询集合-->
 	<select id="selectList" resultMap="base_result_map" >
-		 SELECT <include refid="base_column_list" /> FROM user_contact u <include refid="query_condition" />
+		 SELECT c.*
+		     <if test="query.queryUserInfo">
+				 u.nick_name contactName,u.sex sex
+			 </if>
+		     FROM user_contact c
+			<if test="query.queryUserInfo">
+		     inner join user_info u on c.user_id = u.user_id
+			</if>
+		     <include refid="query_condition" />
 		 <if test="query.orderBy!=null">
 			 order by ${query.orderBy}
 		 </if>
@@ -91,11 +99,11 @@
 
 	<!-- 查询数量-->
 	<select id="selectCount" resultType="java.lang.Integer" >
-		 SELECT count(1) FROM user_contact u <include refid="query_condition" />
+		 SELECT count(1) FROM user_contact c <include refid="query_condition" />
 	</select>
 
 	<!-- 插入 （匹配有值的字段）-->
-	<insert id="insert" parameterType="com.easychat.test.entity.po.UserContact">
+	<insert id="insert" parameterType="com.easychat.entity.po.UserContact">
 		 INSERT INTO user_contact
 		 <trim prefix="(" suffix=")" suffixOverrides="," >
 			<if test="bean.userId != null">
@@ -140,7 +148,7 @@
 	</insert>
 
 	<!-- 插入或者更新 （匹配有值的字段）-->
-	<insert id="insertOrUpdate" parameterType="com.easychat.test.entity.po.UserContact">
+	<insert id="insertOrUpdate" parameterType="com.easychat.entity.po.UserContact">
 		 INSERT INTO user_contact
 		 <trim prefix="(" suffix=")" suffixOverrides=",">
 			<if test="bean.userId != null">
@@ -206,7 +214,7 @@
 	</insert>
 
 	<!-- 添加 （批量插入）-->
-	<insert id="insertBatch" parameterType="com.easychat.test.entity.po.UserContact">
+	<insert id="insertBatch" parameterType="com.easychat.entity.po.UserContact">
 		 INSERT INTO user_contact(
 			 user_id,
 			 contact_id,
@@ -228,7 +236,7 @@
 	</insert>
 
 	<!-- 批量新增修改 （批量插入）-->
-	<insert id="insertOrUpdateBatch" parameterType="com.easychat.test.entity.po.UserContact">
+	<insert id="insertOrUpdateBatch" parameterType="com.easychat.entity.po.UserContact">
 		 INSERT INTO user_contact(
 			 user_id,
 			 contact_id,
@@ -257,7 +265,7 @@
 	</insert>
 
 	<!--多条件修改-->
-	<update id="updateByParam" parameterType="com.easychat.test.entity.query.UserContactQuery">
+	<update id="updateByParam" parameterType="com.easychat.entity.query.UserContactQuery">
 		 UPDATE user_contact u
  		 <set> 
 			<if test="bean.userId != null">
@@ -289,7 +297,7 @@
 	</delete>
 
 	<!-- 根据UserIdAndContactId修改-->
-	<update id="updateByUserIdAndContactId" parameterType="com.easychat.test.entity.po.UserContact">
+	<update id="updateByUserIdAndContactId" parameterType="com.easychat.entity.po.UserContact">
 		 UPDATE user_contact
  		 <set> 
 			<if test="bean.contactType != null">
