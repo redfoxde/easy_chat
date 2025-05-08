@@ -69,4 +69,22 @@ public interface UserContactApplyService {
 	 */
 	Integer deleteUserContactApplyByApplyId(Integer applyId);
 
+
+	/**
+	 * 根据ApplyUserIdAndReceiveUserIdAndContactId查询对象
+	 */
+	UserContactApply getUserContactApplyByApplyUserIdAndReceiveUserIdAndContactId(String applyUserId,String receiveUserId,String contactId);
+
+
+	/**
+	 * 根据ApplyUserIdAndReceiveUserIdAndContactId修改
+	 */
+	Integer updateUserContactApplyByApplyUserIdAndReceiveUserIdAndContactId(UserContactApply bean,String applyUserId,String receiveUserId,String contactId);
+
+
+	/**
+	 * 根据ApplyUserIdAndReceiveUserIdAndContactId删除
+	 */
+	Integer deleteUserContactApplyByApplyUserIdAndReceiveUserIdAndContactId(String applyUserId,String receiveUserId,String contactId);
+
 }

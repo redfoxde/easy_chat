@@ -25,4 +25,22 @@ public interface UserContactApplyMapper<T,P> extends BaseMapper<T,P> {
 	 T selectByApplyId(@Param("applyId") Integer applyId);
 
 
+	/**
+	 * 根据ApplyUserIdAndReceiveUserIdAndContactId更新
+	 */
+	 Integer updateByApplyUserIdAndReceiveUserIdAndContactId(@Param("bean") T t,@Param("applyUserId") String applyUserId,@Param("receiveUserId") String receiveUserId,@Param("contactId") String contactId);
+
+
+	/**
+	 * 根据ApplyUserIdAndReceiveUserIdAndContactId删除
+	 */
+	 Integer deleteByApplyUserIdAndReceiveUserIdAndContactId(@Param("applyUserId") String applyUserId,@Param("receiveUserId") String receiveUserId,@Param("contactId") String contactId);
+
+
+	/**
+	 * 根据ApplyUserIdAndReceiveUserIdAndContactId获取对象
+	 */
+	 T selectByApplyUserIdAndReceiveUserIdAndContactId(@Param("applyUserId") String applyUserId,@Param("receiveUserId") String receiveUserId,@Param("contactId") String contactId);
+
+
 }

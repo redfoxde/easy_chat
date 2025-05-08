@@ -39,4 +39,8 @@ public class TokenUserInfoDto implements Serializable {
     public Boolean getIsAdmin() {
         return isAdmin;
     }
+    public String getNickName() {
+        return nickName;
+    }
+
 }

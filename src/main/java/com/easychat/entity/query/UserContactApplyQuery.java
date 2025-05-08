@@ -52,9 +52,9 @@ public class UserContactApplyQuery extends BaseParam {
 	/**
 	 * 申请信息
 	 */
-	private String apply_info;
+	private String applyInfo;
 
-	private String apply_infoFuzzy;
+	private String applyInfoFuzzy;
 
 
 	public void setApplyId(Integer applyId){
@@ -137,20 +137,20 @@ public class UserContactApplyQuery extends BaseParam {
 		return this.status;
 	}
 
-	public void setApply_info(String apply_info){
-		this.apply_info = apply_info;
+	public void setApplyInfo(String applyInfo){
+		this.applyInfo = applyInfo;
 	}
 
-	public String getApply_info(){
-		return this.apply_info;
+	public String getApplyInfo(){
+		return this.applyInfo;
 	}
 
-	public void setApply_infoFuzzy(String apply_infoFuzzy){
-		this.apply_infoFuzzy = apply_infoFuzzy;
+	public void setApplyInfoFuzzy(String applyInfoFuzzy){
+		this.applyInfoFuzzy = applyInfoFuzzy;
 	}
 
-	public String getApply_infoFuzzy(){
-		return this.apply_infoFuzzy;
+	public String getApplyInfoFuzzy(){
+		return this.applyInfoFuzzy;
 	}
 
 }

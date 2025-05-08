@@ -1,6 +1,6 @@
 package com.easychat.service.impl;
 
-
+import java.util.List;
 
 import javax.annotation.Resource;
 
@@ -14,8 +14,6 @@ import com.easychat.entity.query.SimplePage;
 import com.easychat.mappers.UserContactApplyMapper;
 import com.easychat.service.UserContactApplyService;
 import com.easychat.utils.StringTools;
-
-import java.util.List;
 
 
 /**
@@ -128,5 +126,29 @@ public class UserContactApplyServiceImpl implements UserContactApplyService {
 	@Override
 	public Integer deleteUserContactApplyByApplyId(Integer applyId) {
 		return this.userContactApplyMapper.deleteByApplyId(applyId);
+	}
+
+	/**
+	 * 根据ApplyUserIdAndReceiveUserIdAndContactId获取对象
+	 */
+	@Override
+	public UserContactApply getUserContactApplyByApplyUserIdAndReceiveUserIdAndContactId(String applyUserId, String receiveUserId, String contactId) {
+		return this.userContactApplyMapper.selectByApplyUserIdAndReceiveUserIdAndContactId(applyUserId, receiveUserId, contactId);
+	}
+
+	/**
+	 * 根据ApplyUserIdAndReceiveUserIdAndContactId修改
+	 */
+	@Override
+	public Integer updateUserContactApplyByApplyUserIdAndReceiveUserIdAndContactId(UserContactApply bean, String applyUserId, String receiveUserId, String contactId) {
+		return this.userContactApplyMapper.updateByApplyUserIdAndReceiveUserIdAndContactId(bean, applyUserId, receiveUserId, contactId);
+	}
+
+	/**
+	 * 根据ApplyUserIdAndReceiveUserIdAndContactId删除
+	 */
+	@Override
+	public Integer deleteUserContactApplyByApplyUserIdAndReceiveUserIdAndContactId(String applyUserId, String receiveUserId, String contactId) {
+		return this.userContactApplyMapper.deleteByApplyUserIdAndReceiveUserIdAndContactId(applyUserId, receiveUserId, contactId);
 	}
 }
