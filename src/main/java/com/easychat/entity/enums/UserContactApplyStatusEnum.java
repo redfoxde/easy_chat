@@ -12,7 +12,8 @@ public enum UserContactApplyStatusEnum {
     INIT(0,"待处理"),
     PASS(1,"已通过"),
     REJECT(2,"已拒绝"),
-    BLACKLIST(3,"已拉黑");
+    BLACKLIST(3,"已拉黑"),
+    BLACKLIST_BE(4,"被拉黑");
 
     private Integer status;
     private String desc;

@@ -56,6 +56,15 @@ public class UserContactApplyQuery extends BaseParam {
 
 	private String applyInfoFuzzy;
 
+	private boolean queryContactInfo;
+
+	public void setQueryContactInfo(boolean queryContactInfo) {
+		this.queryContactInfo = queryContactInfo;
+	}
+	public boolean isQueryContactInfo() {
+		return queryContactInfo;
+	}
+
 
 	public void setApplyId(Integer applyId){
 		this.applyId = applyId;

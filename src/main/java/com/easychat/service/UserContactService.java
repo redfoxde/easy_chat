@@ -7,9 +7,6 @@ import com.easychat.entity.dto.UserContactSearchResultDto;
 import com.easychat.entity.query.UserContactQuery;
 import com.easychat.entity.po.UserContact;
 import com.easychat.entity.vo.PaginationResultVO;
-import com.easychat.entity.vo.ResponseVO;
-
-import javax.servlet.http.HttpServletRequest;
 
 
 /**
@@ -83,5 +80,8 @@ public interface UserContactService {
 	 * 添加好友
 	 */
 	Integer applyAdd(TokenUserInfoDto tokenUserInfoDto,String contactId,String applyInfo);
+	/**
+	 * 查看申请
+	 */
 
 }

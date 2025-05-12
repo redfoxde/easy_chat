@@ -53,6 +53,46 @@ public class UserContactQuery extends BaseParam {
 
 	private Boolean queryUserInfo;
 
+	private Boolean excludeMyGroup;
+
+	private Integer[] statusArray;
+
+	public Integer[] getStatusArray() {
+		return statusArray;
+	}
+
+	public void setStatusArray(Integer[] statusArray) {
+		this.statusArray = statusArray;
+	}
+
+	public Boolean getExcludeMyGroup() {
+		return excludeMyGroup;
+	}
+
+	public void setExcludeMyGroup(Boolean excludeMyGroup) {
+		this.excludeMyGroup = excludeMyGroup;
+	}
+
+	private Boolean queryContactUserInfo;
+
+	public Boolean getQueryGroupInfo() {
+		return queryGroupInfo;
+	}
+
+	public Boolean getQueryContactUserInfo() {
+		return queryContactUserInfo;
+	}
+
+	public void setQueryContactUserInfo(Boolean queryContactUserInfo) {
+		this.queryContactUserInfo = queryContactUserInfo;
+	}
+
+	public void setQueryGroupInfo(Boolean queryGroupInfo) {
+		this.queryGroupInfo = queryGroupInfo;
+	}
+
+	private Boolean queryGroupInfo;
+
 	public Boolean getQueryUserInfo() {
 		return queryUserInfo;
 	}

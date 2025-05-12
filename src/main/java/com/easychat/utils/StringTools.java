@@ -65,7 +65,7 @@ public class StringTools {
     }
 
     public static String getGroupId(){
-        return UserContactTypeEnum.USER.getPrefix()+getRandomNumber(constants.Length_11);
+        return UserContactTypeEnum.GROUP.getPrefix()+getRandomNumber(constants.Length_11);
     }
 
     public static  String getRandomNumber(int count) {
