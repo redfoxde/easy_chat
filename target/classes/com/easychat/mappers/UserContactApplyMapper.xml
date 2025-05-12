@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.easychat.mappers.UserContactApplyMapper">
 
@@ -50,7 +50,7 @@
 				 and  u.last_apply_time = #{query.lastApplyTime}
 			</if>
 			<if test="query.status != null">
-				 and  u.status = #{query.status}
+				 and  a.status = #{query.status}
 			</if>
 			<if test="query.applyInfo != null and query.applyInfo!=''">
 				 and  u.apply_info = #{query.applyInfo}
@@ -74,7 +74,7 @@
 				 and  u.receive_user_id like concat('%', #{query.receiveUserIdFuzzy}, '%')
 			</if>
 			<if test="query.contactIdFuzzy!= null  and query.contactIdFuzzy!=''">
-				 and  u.contact_id like concat('%', #{query.contactIdFuzzy}, '%')
+				 and  a.contact_id like concat('%', #{query.contactIdFuzzy}, '%')
 			</if>
 			<if test="query.applyInfoFuzzy!= null  and query.applyInfoFuzzy!=''">
 				 and  u.apply_info like concat('%', #{query.applyInfoFuzzy}, '%')
@@ -84,7 +84,19 @@
 
 	<!-- 查询集合-->
 	<select id="selectList" resultMap="base_result_map" >
-		 SELECT <include refid="base_column_list" /> FROM user_contact_apply u <include refid="query_condition" />
+		 SELECT a.*
+		 <if test="query.queryContactInfo">
+			,case
+			when a.contact_type=0 then u.nick_name
+		 	when a.contact_type=1 then g.group_name
+		 	end as contactName
+		 </if>
+		 FROM user_contact_apply a
+		 <if test="query.queryContactInfo">
+			 LEFT JOIN user_info u ON u.user_id = a.apply_user_id and a.receive_user_id = #{query.receiveUserId}
+				left join group_info g on g.group_id = a.contact_id	and a.receive_user_id = #{query.receiveUserId}
+		 </if>
+		 <include refid="query_condition" />
 		 <if test="query.orderBy!=null">
 			 order by ${query.orderBy}
 		 </if>
@@ -95,7 +107,7 @@
 
 	<!-- 查询数量-->
 	<select id="selectCount" resultType="java.lang.Integer" >
-		 SELECT count(1) FROM user_contact_apply u <include refid="query_condition" />
+		 SELECT count(1) FROM user_contact_apply a <include refid="query_condition" />
 	</select>
 
 	<!-- 插入 （匹配有值的字段）-->
@@ -157,7 +169,7 @@
 
 	<!-- 插入或者更新 （匹配有值的字段）-->
 	<insert id="insertOrUpdate" parameterType="com.easychat.entity.po.UserContactApply">
-		 INSERT INTO user_contact_apply
+		 INSERT INTO user_contact_apply a
 		 <trim prefix="(" suffix=")" suffixOverrides=",">
 			<if test="bean.applyId != null">
 				 apply_id,
@@ -210,7 +222,7 @@
 				 #{bean.applyInfo},
 			</if>
 		 </trim>
-		 on DUPLICATE key update 
+		 on DUPLICATE key update
 		 <trim prefix="" suffix="" suffixOverrides=",">
 			<if test="bean.applyId!=null">
 				 apply_id = VALUES(apply_id),
@@ -289,7 +301,7 @@
 				 #{item.applyInfo}
 			 )
 		 </foreach>
-			on DUPLICATE key update 
+			on DUPLICATE key update
 			apply_id = VALUES(apply_id),
 			apply_user_id = VALUES(apply_user_id),
 			receive_user_id = VALUES(receive_user_id),
@@ -303,7 +315,7 @@
 	<!--多条件修改-->
 	<update id="updateByParam" parameterType="com.easychat.entity.query.UserContactApplyQuery">
 		 UPDATE user_contact_apply u
- 		 <set> 
+ 		 <set>
 			<if test="bean.applyId != null">
 				 apply_id = #{bean.applyId},
 			</if>
@@ -341,7 +353,7 @@
 	<!-- 根据ApplyId修改-->
 	<update id="updateByApplyId" parameterType="com.easychat.entity.po.UserContactApply">
 		 UPDATE user_contact_apply
- 		 <set> 
+ 		 <set>
 			<if test="bean.applyUserId != null">
 				 apply_user_id = #{bean.applyUserId},
 			</if>
@@ -380,7 +392,7 @@
 	<!-- 根据ApplyUserIdAndReceiveUserIdAndContactId修改-->
 	<update id="updateByApplyUserIdAndReceiveUserIdAndContactId" parameterType="com.easychat.entity.po.UserContactApply">
 		 UPDATE user_contact_apply
- 		 <set> 
+ 		 <set>
 			<if test="bean.applyId != null">
 				 apply_id = #{bean.applyId},
 			</if>
