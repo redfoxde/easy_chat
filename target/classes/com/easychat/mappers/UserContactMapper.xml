@@ -75,6 +75,10 @@
 			<if test="query.lastUpdateTimeEnd!= null and query.lastUpdateTimeEnd!=''">
 				 <![CDATA[ and  u.last_update_time< date_sub(str_to_date(#{query.lastUpdateTimeEnd},'%Y-%m-%d'),interval -1 day) ]]>
 			</if>
+
+		 <if test="query.statusArray!= null and query.statusArray.length>0 ">
+			 and c.status in(<foreach collection="query.statusArray" separator="," index="item">#{item}</foreach>)
+		 </if>
 	 </where>
 	</sql>
 
@@ -96,6 +100,9 @@
 			</if>
 		<if test="query.queryGroupInfo">
 			inner join group_info g on c.contact_id = g.group_id
+		     <if test="query.excludeMyGroup">
+				 and g.group_owner_id!=c.user_id
+			 </if>
 		</if>
 		     <include refid="query_condition" />
 		 <if test="query.orderBy!=null">
