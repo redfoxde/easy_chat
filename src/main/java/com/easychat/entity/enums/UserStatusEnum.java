@@ -1,5 +1,7 @@
 package com.easychat.entity.enums;
 
+import com.easychat.utils.StringTools;
+
 /**
  * @ClassName UserStatusEnum
  * @Author chenhongxin
@@ -26,6 +28,15 @@ public enum UserStatusEnum {
         }
         return null;
     }
+    public static UserStatusEnum getByStatus(Integer status){
+        for(UserStatusEnum item : UserStatusEnum.values()){
+            if(item.getStatus().equals(status)){
+                return item;
+            }
+        }
+        return null;
+    }
+
     public Integer getStatus() {
         return status;
     }

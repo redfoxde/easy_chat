@@ -294,4 +294,20 @@ public class UserInfoServiceImpl implements UserInfoService {
 		//TODO 更新会话信息中的昵称
 
 	}
+
+	@Override
+	public void updateUserStatus(Integer status, String userId) {
+		UserStatusEnum userStatusEnum = UserStatusEnum.getByStatus(status);
+		if(userStatusEnum == null){
+			throw new BusinessException(ResponseCodeEnum.CODE_600);
+		}
+		UserInfo userInfo = new UserInfo();
+		userInfo.setStatus(userStatusEnum.getStatus());
+		this.userInfoMapper.updateByUserId(userInfo,userId);
+	}
+
+	@Override
+	public void forceOffline(String userId) {
+		//TODO 强制下线
+	}
 }

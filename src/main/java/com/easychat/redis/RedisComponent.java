@@ -41,4 +41,8 @@ public class RedisComponent {
         return sysSettingDto;
     }
 
+    public void saveSysSetting(SysSettingDto sysSettingDto){
+        redisUtils.set(constants.REDIS_SYS_SETTING, String.valueOf(sysSettingDto));
+    }
+
 }

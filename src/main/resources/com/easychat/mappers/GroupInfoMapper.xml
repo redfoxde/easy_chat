@@ -85,7 +85,15 @@
 
 	<!-- 查询集合-->
 	<select id="selectList" resultMap="base_result_map" >
-		 SELECT <include refid="base_column_list" /> FROM group_info g <include refid="query_condition" />
+		 SELECT <include refid="base_column_list" />
+		<if test="query.queryGroupOwnerName">
+			,(select nick_name from user_info u where u.user_id = g.group_owner_id) groupOwnerNickName
+		</if>
+		<if test="query.queryMemberCount">
+			,(select count(1) from user_contact c where c.contact_id=g.group_id) memberCount
+		</if>
+
+		FROM group_info g <include refid="query_condition" />
 		 <if test="query.orderBy!=null">
 			 order by ${query.orderBy}
 		 </if>

@@ -11,17 +11,15 @@ import javax.annotation.Resource;
 import com.easychat.entity.config.AppConfig;
 import com.easychat.entity.constants.constants;
 import com.easychat.entity.dto.SysSettingDto;
-import com.easychat.entity.enums.ResponseCodeEnum;
-import com.easychat.entity.enums.UserContactStatusEnum;
-import com.easychat.entity.enums.UserContactTypeEnum;
+import com.easychat.entity.enums.*;
 import com.easychat.entity.po.UserContact;
 import com.easychat.entity.query.UserContactQuery;
+import com.easychat.entity.query.UserInfoQuery;
 import com.easychat.exception.BusinessException;
 import com.easychat.mappers.UserContactMapper;
 import com.easychat.redis.RedisComponent;
 import org.springframework.stereotype.Service;
 
-import com.easychat.entity.enums.PageSize;
 import com.easychat.entity.query.GroupInfoQuery;
 import com.easychat.entity.po.GroupInfo;
 import com.easychat.entity.vo.PaginationResultVO;
@@ -216,6 +214,32 @@ public class GroupInfoServiceImpl implements GroupInfoService {
 		String filePath = targetFileFolder+"/"+groupInfo.getGroupId()+constants.IMAGE_SUFFIX;
 		avatarFile.transferTo(new File(filePath));
 		avatarCover.transferTo(new File(filePath+constants.COVER_IMAGE_SUFFIX));
+
+	}
+
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public void dissolutionGroup(String groupOwnerId, String groupId) {
+		GroupInfo dbInfo = this.groupInfoMapper.selectByGroupId(groupId);
+		if(null==dbInfo || !dbInfo.getGroupOwnerId().equals(groupOwnerId)){
+			throw new BusinessException(ResponseCodeEnum.CODE_600);
+		}
+		//删除群组
+		GroupInfo updateInfo = new GroupInfo();
+		updateInfo.setStatus(GroupStatusEnum.DISSOLUTION.getStatus());
+		this.groupInfoMapper.updateByGroupId(updateInfo,groupId);
+
+		//删除联系人
+		UserContactQuery userContactQuery = new UserContactQuery();
+		userContactQuery.setUserId(groupId);
+		userContactQuery.setContactType(UserContactTypeEnum.GROUP.getType());
+
+		UserContact updateContact = new UserContact();
+		updateContact.setStatus(UserContactStatusEnum.DEL.getStatus());
+		this.userContactMapper.updateByParam(updateContact,userContactQuery);
+
+		//TODO 移除相关群员的联系人缓存
+		//TODO 发消息： 1.更新会话信息 2.记录群信息 3.发送解散群通知信息
 
 	}
 }

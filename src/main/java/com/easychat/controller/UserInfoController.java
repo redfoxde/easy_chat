@@ -26,7 +26,7 @@ import java.io.IOException;
  * @Date 2025/5/13 下午12:57
  * @mood happy
  */
-@RestController
+@RestController("userInfoController")
 @RequestMapping("/userInfo")
 public class UserInfoController extends ABaseController {
     @Resource

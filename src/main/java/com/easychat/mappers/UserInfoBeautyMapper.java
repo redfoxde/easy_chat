@@ -60,5 +60,8 @@ public interface UserInfoBeautyMapper<T,P> extends BaseMapper<T,P> {
 	 */
 	 T selectByEmail(@Param("email") String email);
 
-
+	/**
+	 *根据ID进行删除
+	 */
+	Integer deleteById(@Param("id") Integer id);
 }

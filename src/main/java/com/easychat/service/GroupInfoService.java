@@ -75,4 +75,8 @@ public interface GroupInfoService {
 	 * 创建群聊
 	 */
 	void saveGroup(GroupInfo groupInfo, MultipartFile avatarFile, MultipartFile avatarCover) throws IOException;
+	/**
+	 * 解散群聊
+	 */
+	void dissolutionGroup(String groupOwnerId, String groupId);
 }

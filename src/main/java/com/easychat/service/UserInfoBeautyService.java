@@ -69,6 +69,10 @@ public interface UserInfoBeautyService {
 	 */
 	Integer deleteUserInfoBeautyByIdAndUserId(Integer id,String userId);
 
+	/**
+	 * 根据ID删除
+	 */
+	Integer deleteUserInfoBeautyById(Integer id);
 
 	/**
 	 * 根据UserId查询对象
@@ -104,5 +108,10 @@ public interface UserInfoBeautyService {
 	 * 根据Email删除
 	 */
 	Integer deleteUserInfoBeautyByEmail(String email);
+
+	/**
+	 * 新增靓号
+	 */
+	void saveAccount(UserInfoBeauty beauty);
 
 }

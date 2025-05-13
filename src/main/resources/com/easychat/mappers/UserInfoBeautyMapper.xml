@@ -297,4 +297,9 @@
 		select <include refid="base_column_list" /> from user_info_beauty u where email=#{email}
 	</select>
 
+	<!--根据ID进行删除-->
+	<delete id="deleteById">
+		delete from user_info_beauty where id=#{id}
+	</delete>
+
 </mapper>
