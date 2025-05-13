@@ -41,5 +41,7 @@ public class constants {
 
     public static final String APPLY_INFO_TEMPLATE = "我是%s";
 
+    public static final String REGEX_PASSWORD = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[!@#$%^&*()_+])[A-Za-z\\d!@#$%^&*()_+]{8,12}$";
+
 
 }

@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.easychat.entity.dto.TokenUserInfoDto;
 import com.easychat.entity.dto.UserContactSearchResultDto;
+import com.easychat.entity.enums.UserContactStatusEnum;
 import com.easychat.entity.query.UserContactQuery;
 import com.easychat.entity.po.UserContact;
 import com.easychat.entity.vo.PaginationResultVO;
@@ -81,7 +82,12 @@ public interface UserContactService {
 	 */
 	Integer applyAdd(TokenUserInfoDto tokenUserInfoDto,String contactId,String applyInfo);
 	/**
-	 * 查看申请
+	 * 删除联系人
 	 */
+	void removeUserContact(String userId, String contactId, UserContactStatusEnum statusEnum);
+	/**
+	 *添加联系人
+	 */
+	void addContact(String applyUserId,String receiveUserId,String contactId,Integer contactType,String applyInfo);
 
 }

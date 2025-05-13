@@ -1,5 +1,7 @@
 package com.easychat.service.impl;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -21,6 +23,7 @@ import com.easychat.utils.CopyTools;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.ibatis.reflection.ArrayUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.couchbase.CouchbaseProperties;
 import org.springframework.stereotype.Service;
 
 import com.easychat.entity.query.UserInfoQuery;
@@ -30,6 +33,7 @@ import com.easychat.mappers.UserInfoMapper;
 import com.easychat.service.UserInfoService;
 import com.easychat.utils.StringTools;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 
 /**
@@ -267,5 +271,27 @@ public class UserInfoServiceImpl implements UserInfoService {
         return tokenUserInfoDto;
     }
 
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public void updateUserInfo(UserInfo userInfo, MultipartFile avatarFile, MultipartFile avatarCover) throws IOException {
+		if(avatarFile !=null){
+			String baseFolder = appConfig.getProjectFolder()+constants.FILE_FOLDER_FILE;
+			File targetFileFolder = new File(baseFolder +constants.FILE_FOLDER_AVATAR_NAME);
+			if(!targetFileFolder.exists()){
+				targetFileFolder.mkdirs();
+			}
+			String filePath = targetFileFolder.getPath()+"/"+userInfo.getUserId()+constants.IMAGE_SUFFIX;
+			avatarFile.transferTo(new File(filePath));
+			avatarCover.transferTo(new File(filePath+constants.COVER_IMAGE_SUFFIX));
+		}
+		UserInfo dbInfo = this.userInfoMapper.selectByUserId(userInfo.getUserId());
+		this.userInfoMapper.updateByUserId(userInfo,userInfo.getUserId());
 
+		String contactNameUpdate = null;
+		if(dbInfo.getNickName().equals(userInfo.getNickName())){
+			contactNameUpdate=dbInfo.getNickName();
+		}
+		//TODO 更新会话信息中的昵称
+
+	}
 }

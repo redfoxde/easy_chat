@@ -2,28 +2,24 @@ package com.easychat.controller;
 
 import com.easychat.annotation.GlobalInterceptor;
 import com.easychat.entity.constants.constants;
-import com.easychat.entity.dto.TokenUserInfoDto;
-import com.easychat.entity.po.UserInfo;
 import com.easychat.entity.vo.ResponseVO;
 import com.easychat.entity.vo.UserInfoVO;
 import com.easychat.exception.BusinessException;
 import com.easychat.redis.RedisComponent;
 import com.easychat.redis.RedisUtils;
 import com.easychat.service.UserInfoService;
-import com.easychat.utils.CopyTools;
 import com.wf.captcha.ArithmeticCaptcha;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.validation.BindException;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.mvc.AbstractController;
+
 
 import javax.annotation.Resource;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Pattern;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -67,7 +63,7 @@ public class AccountController extends ABaseController{
     @RequestMapping("/register")
     public ResponseVO register(@NotEmpty String checkCodeKey,
                                @NotEmpty @Email String email,
-                               @NotEmpty String password,
+                               @NotEmpty @Pattern(regexp = constants.REGEX_PASSWORD) String password,
                                @NotEmpty String nickName,
                                @NotEmpty String checkCode) {
         try{

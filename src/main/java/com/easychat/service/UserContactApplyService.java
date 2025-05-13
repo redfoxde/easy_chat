@@ -92,9 +92,4 @@ public interface UserContactApplyService {
 	 */
 	void dealWithApply(String userId,Integer applyId,Integer status);
 
-
-	/**
-	 *添加联系人
-	 */
-	void addContact(String applyUserId,String receiveUserId,String contactId,Integer contactType,String applyInfo);
 }
