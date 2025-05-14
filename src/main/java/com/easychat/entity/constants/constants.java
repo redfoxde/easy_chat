@@ -11,6 +11,8 @@ import com.easychat.entity.enums.UserContactTypeEnum;
 public class constants {
     public static final String EASY_CHAT = "easychat:checkcode";
 
+    public static final Integer REDIS_KEY_EXPRESS_HEART_BEAT = 6;
+
     public static final String REDIS_USER_HEART_BEAT= "easychat:ws:user:heartbeat";
     /**
      * 存Token
@@ -22,6 +24,10 @@ public class constants {
     public static final Integer Time_IMIN = 60;
 
     public static final Integer REDIS_KEY_EXPRESS_DAY = Time_IMIN*60*24;
+
+    //token失效时间
+    public static final Integer REDIS_KEY_TOKEN_EXPIRES = REDIS_KEY_EXPRESS_DAY*2;
+
 
     public static final Integer Length_11= 11;
 
@@ -43,5 +49,7 @@ public class constants {
 
     public static final String REGEX_PASSWORD = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[!@#$%^&*()_+])[A-Za-z\\d!@#$%^&*()_+]{8,12}$";
 
+    //用户联系人列表
+    public static final String REDIS_KEY_USER_CONTACT = "easychat:ws:user:contact";
 
 }

@@ -66,7 +66,15 @@ public class GlobalOperationAspect {
 
     private void checkLogin(Boolean checkAdmin){
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (attributes == null) {
+            logger.warn("非HTTP请求（可能是WebSocket握手），跳过登录校验");
+            return;
+        }
         HttpServletRequest request = attributes.getRequest();
+        if (request.getRequestURI().startsWith("/ws")) {
+            logger.warn("WebSocket握手请求跳过拦截器校验");
+            return;
+        }
         String token = request.getHeader("token");
         if(StringTools.isEmpty(token)){
             throw new BusinessException(ResponseCodeEnum.CODE_901);

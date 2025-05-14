@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
@@ -13,10 +14,13 @@ import com.easychat.entity.config.AppConfig;
 import com.easychat.entity.constants.constants;
 import com.easychat.entity.dto.TokenUserInfoDto;
 import com.easychat.entity.enums.*;
+import com.easychat.entity.po.UserContact;
 import com.easychat.entity.po.UserInfoBeauty;
 import com.easychat.entity.query.SimplePage;
+import com.easychat.entity.query.UserContactQuery;
 import com.easychat.entity.vo.UserInfoVO;
 import com.easychat.exception.BusinessException;
+import com.easychat.mappers.UserContactMapper;
 import com.easychat.mappers.UserInfoBeautyMapper;
 import com.easychat.redis.RedisComponent;
 import com.easychat.utils.CopyTools;
@@ -52,6 +56,8 @@ public class UserInfoServiceImpl implements UserInfoService {
 	private AppConfig appConfig;
     @Autowired
     private RedisComponent redisComponent;
+    @Autowired
+    private UserContactMapper userContactMapper;
 
 	/**
 	 * 根据条件查询列表
@@ -204,7 +210,7 @@ public class UserInfoServiceImpl implements UserInfoService {
 			userInfo.setPassword(StringTools.encodeMd5(password));
 			userInfo.setEmail(email);
 			userInfo.setCreatTime(curDate);
-			//TODO 创建用户状态枚举类
+
 			userInfo.setStatus(UserStatusEnum.ENABLE.getStatus());
 			userInfo.setLastOffTime(curDate.getTime());
 			userInfo.setJoinType(JoinTypeEnum.APPLY.getType());
@@ -227,7 +233,7 @@ public class UserInfoServiceImpl implements UserInfoService {
 		if(null==userInfo||!userInfo.getPassword().equals(StringTools.encodeMd5(password))) {
 			throw new BusinessException("账号或密码不正确");
 		}
-		//TODO 用户状态枚举类型
+
 		if(UserStatusEnum.DISABLE.equals(userInfo.getStatus())){
 			throw new BusinessException("账号已禁用");
 		}
@@ -237,8 +243,18 @@ public class UserInfoServiceImpl implements UserInfoService {
 			throw new BusinessException("此账号已在别处登录，请退出后重试");
 		}
 
-		//TODO 查询我的群组
-		//TODO 查询我的联系人
+		//查询联系人
+		UserContactQuery contactQuery=new UserContactQuery();
+		contactQuery.setUserId(userInfo.getUserId());
+		contactQuery.setStatus(UserContactStatusEnum.FRIEND.getStatus());
+		List<UserContact> contactList = userContactMapper.selectList(contactQuery);
+		List<String> contactIdList = contactList.stream().map(item->item.getContactId()).collect(Collectors.toList());
+
+		redisComponent.cleanUserContact(userInfo.getUserId());
+		if(!contactIdList.isEmpty()) {
+			redisComponent.addUserContactBatch(userInfo.getUserId(), contactIdList);
+		}
+
 		TokenUserInfoDto tokenUserInfoDto=getTokenUserInfoDto(userInfo);
 
 		//保存信息到redis中

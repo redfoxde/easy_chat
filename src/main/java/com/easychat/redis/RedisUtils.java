@@ -463,6 +463,23 @@ public class RedisUtils<V> {
         //redisTemplate.opsForList().leftPushAll(key,"w","x","y");
         redisTemplate.opsForList().rightPushAll(key, values);
     }
+    /**
+     * 批量存储用户联系人关系（带过期时间）
+     * @param userContactKey 用户联系人键（格式：Constants.REDIS_KEY_USER_CONTACT + userId）
+     * @param contactIdList  联系人ID集合
+     * @param expireSeconds  过期时间（单位：秒）
+     * @return 操作后的列表长度
+     */
+    public Long lpushAll(String userContactKey, List<String> contactIdList, long expireSeconds) {
+        // 批量左推联系人ID
+        Long listSize = redisTemplate.opsForList().leftPushAll(userContactKey, contactIdList);
+
+        // 设置过期时间（示例使用 Constants.REDIS_KEY_TOKEN_EXPIRES）
+        redisTemplate.expire(userContactKey, expireSeconds, TimeUnit.SECONDS);
+
+        return listSize;
+    }
+
 
     /**
      * 向已存在的集合中添加元素。
