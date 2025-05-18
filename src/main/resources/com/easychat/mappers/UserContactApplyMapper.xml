@@ -26,34 +26,34 @@
 
 	<!-- 通用查询结果列-->
 	<sql id="base_column_list">
-		 u.apply_id,u.apply_user_id,u.receive_user_id,u.contact_type,u.contact_id,
-		 u.last_apply_time,u.status,u.apply_info
+		 apply_id,apply_user_id,receive_user_id,contact_type,contact_id,
+		 last_apply_time,status,apply_info
 	</sql>
 
 	<sql id="base_condition_filed">
 			<if test="query.applyId != null">
-				 and  u.apply_id = #{query.applyId}
+				 and  apply_id = #{query.applyId}
 			</if>
 			<if test="query.applyUserId != null and query.applyUserId!=''">
-				 and  u.apply_user_id = #{query.applyUserId}
+				 and  apply_user_id = #{query.applyUserId}
 			</if>
 			<if test="query.receiveUserId != null and query.receiveUserId!=''">
-				 and  u.receive_user_id = #{query.receiveUserId}
+				 and  receive_user_id = #{query.receiveUserId}
 			</if>
 			<if test="query.contactType != null">
-				 and  u.contact_type = #{query.contactType}
+				 and  contact_type = #{query.contactType}
 			</if>
 			<if test="query.contactId != null and query.contactId!=''">
-				 and  u.contact_id = #{query.contactId}
+				 and  contact_id = #{query.contactId}
 			</if>
 			<if test="query.lastApplyTime != null">
-				 and  u.last_apply_time = #{query.lastApplyTime}
+				 and  last_apply_time = #{query.lastApplyTime}
 			</if>
 			<if test="query.status != null">
-				 and  a.status = #{query.status}
+				 and  status = #{query.status}
 			</if>
 			<if test="query.applyInfo != null and query.applyInfo!=''">
-				 and  u.apply_info = #{query.applyInfo}
+				 and  apply_info = #{query.applyInfo}
 			</if>
 	</sql>
 	<!-- 通用条件列-->
@@ -68,16 +68,19 @@
 	 <where>
 			<include refid="base_condition_filed" />
 			<if test="query.applyUserIdFuzzy!= null  and query.applyUserIdFuzzy!=''">
-				 and  u.apply_user_id like concat('%', #{query.applyUserIdFuzzy}, '%')
+				 and  a.apply_user_id like concat('%', #{query.applyUserIdFuzzy}, '%')
 			</if>
 			<if test="query.receiveUserIdFuzzy!= null  and query.receiveUserIdFuzzy!=''">
-				 and  u.receive_user_id like concat('%', #{query.receiveUserIdFuzzy}, '%')
+				 and  a.receive_user_id like concat('%', #{query.receiveUserIdFuzzy}, '%')
 			</if>
 			<if test="query.contactIdFuzzy!= null  and query.contactIdFuzzy!=''">
 				 and  a.contact_id like concat('%', #{query.contactIdFuzzy}, '%')
 			</if>
 			<if test="query.applyInfoFuzzy!= null  and query.applyInfoFuzzy!=''">
-				 and  u.apply_info like concat('%', #{query.applyInfoFuzzy}, '%')
+				 and  a.apply_info like concat('%', #{query.applyInfoFuzzy}, '%')
+			</if>
+			<if test="query.lastApplyTimestamp!=null">
+				and  last_apply_time>=#{query.lastApplyTimestamp}
 			</if>
 	 </where>
 	</sql>

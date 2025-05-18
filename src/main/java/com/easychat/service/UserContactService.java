@@ -76,11 +76,6 @@ public interface UserContactService {
 	 * 搜索好友
 	 */
 	UserContactSearchResultDto searchContact(String userId, String contactId);
-
-	/**
-	 * 添加好友
-	 */
-	Integer applyAdd(TokenUserInfoDto tokenUserInfoDto,String contactId,String applyInfo);
 	/**
 	 * 删除联系人
 	 */
@@ -89,5 +84,9 @@ public interface UserContactService {
 	 *添加联系人
 	 */
 	void addContact(String applyUserId,String receiveUserId,String contactId,Integer contactType,String applyInfo);
+	/**
+	 * 添加机器人
+	 */
+	void addContact4Robot(String userId);
 
 }

@@ -22,6 +22,7 @@ import com.easychat.utils.CopyTools;
 import jodd.util.ArraysUtil;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -35,7 +36,7 @@ import java.util.List;
  * @Date 2025/5/8 下午2:38
  * @mood happy
  */
-@Controller
+@RestController
 @RequestMapping("/contact")
 public class UserContactController extends ABaseController {
 
@@ -65,7 +66,7 @@ public class UserContactController extends ABaseController {
                              @NotEmpty String contactId,
                                String applyInfo) {
         TokenUserInfoDto tokenUserInfoDto = getTokenUserInfoDto(request);
-        Integer joinType = userContactService.applyAdd(tokenUserInfoDto,contactId,applyInfo);
+        Integer joinType = userContactApplyService.applyAdd(tokenUserInfoDto,contactId,applyInfo);
 
         return getSuccessResponseVO(joinType);
 

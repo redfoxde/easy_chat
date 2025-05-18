@@ -6,28 +6,22 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
-import com.easychat.entity.constants.constants;
+import com.easychat.entity.dto.MessageSendDto;
 import com.easychat.entity.dto.SysSettingDto;
-import com.easychat.entity.dto.TokenUserInfoDto;
 import com.easychat.entity.dto.UserContactSearchResultDto;
 import com.easychat.entity.enums.*;
-import com.easychat.entity.po.GroupInfo;
-import com.easychat.entity.po.UserContactApply;
-import com.easychat.entity.po.UserInfo;
+import com.easychat.entity.po.*;
 import com.easychat.entity.query.*;
 import com.easychat.exception.BusinessException;
-import com.easychat.mappers.GroupInfoMapper;
-import com.easychat.mappers.UserContactApplyMapper;
-import com.easychat.mappers.UserInfoMapper;
+import com.easychat.mappers.*;
 import com.easychat.redis.RedisComponent;
-import com.easychat.service.UserContactApplyService;
 import com.easychat.utils.CopyTools;
-import org.apache.commons.lang3.ArrayUtils;
+import com.easychat.websocket.ChannelContextUtils;
+import com.easychat.websocket.netty.MessageHandler;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.easychat.entity.po.UserContact;
 import com.easychat.entity.vo.PaginationResultVO;
-import com.easychat.mappers.UserContactMapper;
 import com.easychat.service.UserContactService;
 import com.easychat.utils.StringTools;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,6 +47,21 @@ public class UserContactServiceImpl implements UserContactService {
 
 	@Resource
 	private RedisComponent redisComponent;
+
+	@Resource
+	private ChatSessionMapper<ChatSession, ChatSessionQuery> chatSessionMapper;
+
+	@Resource
+	private ChatSessionUserMapper<ChatSessionUser, ChatSessionUserQuery> chatSessionUserMapper;
+
+	@Resource
+	private ChatMessageMapper<ChatMessage, ChatMessageQuery> chatMessageMapper;
+
+    @Autowired
+    private MessageHandler messageHandler;
+
+	@Resource
+	private ChannelContextUtils channelContextUtils;
 
 	/**
 	 * 根据条件查询列表
@@ -202,87 +211,6 @@ public class UserContactServiceImpl implements UserContactService {
         return resultDto;
     }
 
-	/**
-	 * 添加好友
-	 */
-	@Override
-	@Transactional(rollbackFor = Exception.class)
-	public Integer applyAdd(TokenUserInfoDto tokenUserInfoDto,String contactId,String applyInfo) {
-		UserContactTypeEnum typeEnum = UserContactTypeEnum.getByPrefix(contactId);
-		if (typeEnum == null) {
-			throw new BusinessException(ResponseCodeEnum.CODE_600);
-		}
-		//申请人信息
-		String applyUserId = tokenUserInfoDto.getUserId();
-
-		//默认信息
-		applyInfo = StringTools.isEmpty(applyInfo)?String.format(constants.APPLY_INFO_TEMPLATE,tokenUserInfoDto.getNickName()): applyInfo;
-
-		Long curTime = System.currentTimeMillis();
-
-		Integer joinType = null;
-		String receiveUserId = contactId;
-
-		//查询对方好友是否添加，如果已拉黑则无法添加
-		UserContact userContact = userContactMapper.selectByUserIdAndContactId(applyUserId, contactId);
-		if (userContact != null&&
-				ArrayUtils.contains(new Integer[]{
-						UserContactStatusEnum.BLACKLIST_BE.getStatus(),
-						UserContactStatusEnum.BLACKLIST_BE_FIRST.getStatus(),
-				},userContact.getStatus())
-				) {
-			throw new BusinessException("对方已将你拉黑");
-		}
-
-		//加群
-		if(UserContactTypeEnum.GROUP.equals(typeEnum)){
-			GroupInfo groupInfo = groupInfoMapper.selectByGroupId(contactId);
-			if (groupInfo == null|| GroupStatusEnum.DISSOLUTION.getStatus().equals(groupInfo.getStatus())) {
-				throw new BusinessException("群聊不存在或已解散");
-			}
-			receiveUserId = groupInfo.getGroupId();
-			joinType = groupInfo.getJoinType();
-		}else {
-			UserInfo userInfo = userInfoMapper.selectByUserId(contactId);
-			if (userInfo == null) {
-				throw new BusinessException(ResponseCodeEnum.CODE_600);
-			}
-			joinType = userInfo.getJoinType();
-		}
-
-		//直接加入不用申请记录
-		if(JoinTypeEnum.JOIN.getType().equals(joinType)){
-			this.addContact(applyUserId,receiveUserId,contactId,typeEnum.getType(),applyInfo);
-
-			return joinType;
-		}
-
-		UserContactApply dbApply = this.userContactApplyMapper.selectByApplyUserIdAndReceiveUserIdAndContactId(applyUserId, receiveUserId, contactId);
-		if(dbApply == null){
-			UserContactApply contactApply = new UserContactApply();
-			contactApply.setApplyUserId(applyUserId);
-			contactApply.setContactType(typeEnum.getType());
-			contactApply.setReceiveUserId(receiveUserId);
-			contactApply.setLastApplyTime(curTime);
-			contactApply.setContactId(contactId);
-			contactApply.setStatus(UserContactApplyStatusEnum.INIT.getStatus());
-			contactApply.setApplyInfo(applyInfo);
-			this.userContactApplyMapper.insert(contactApply);
-		}else{
-			//更新状态
-			UserContactApply contactApply = new UserContactApply();
-			contactApply.setStatus(UserContactApplyStatusEnum.INIT.getStatus());
-			contactApply.setApplyUserId(applyUserId);
-			contactApply.setApplyInfo(applyInfo);
-			this.userContactApplyMapper.updateByApplyId(contactApply,dbApply.getApplyId());
-		}
-		if(dbApply == null||!dbApply.getStatus().equals(UserContactApplyStatusEnum.INIT.getStatus())){
-			//TODO 发送ws消息
-		}
-
-        return joinType;
-    }
-
 	@Override
 	@Transactional(rollbackFor = BusinessException.class)
 	public void addContact(String applyUserId, String receiveUserId, String contactId, Integer contactType, String applyInfo) {
@@ -324,9 +252,119 @@ public class UserContactServiceImpl implements UserContactService {
 		}
 		//批量插入
 		userContactMapper.insertOrUpdate(userContact);
-		//TODO 如果是好友，接收人也添加申请人为好友 添加缓存
 
-		//TODO 创建会话 发送消息
+		if(UserContactTypeEnum.USER.getType().equals(contactType)){
+			redisComponent.addUserContact(receiveUserId,applyUserId);
+		}
+		redisComponent.addUserContact(applyUserId,contactId);
+
+		//创建会话
+		String sessionId = null;
+		if(UserContactTypeEnum.USER.getType().equals(contactType)) {
+			sessionId = StringTools.getChatISessionID4User(new String[]{applyUserId,contactId});
+		}else{
+			sessionId = StringTools.getChatISessionID4Group(contactId);
+		}
+
+		List<ChatSessionUser> chatSessionUserList = new ArrayList<>();
+		if(UserContactTypeEnum.USER.getType().equals(contactType)){
+			//单聊
+			ChatSession chatSession = new ChatSession();
+			chatSession.setSessionId(sessionId);
+			chatSession.setLastMessage(applyInfo);
+			chatSession.setLastReceiveTime(curDate.getTime());
+			this.chatSessionMapper.insertOrUpdate(chatSession);
+
+
+			//申请人session
+			ChatSessionUser applySessionUser = new ChatSessionUser();
+			applySessionUser.setUserId(applyUserId);
+			applySessionUser.setContactId(contactId);
+			applySessionUser.setSessionId(sessionId);
+			UserInfo contactUser = this.userInfoMapper.selectByUserId(contactId);
+			applySessionUser.setContactName(contactUser.getNickName());
+			chatSessionUserList.add(applySessionUser);
+
+			//接受人session
+			ChatSessionUser contactSessionUser = new ChatSessionUser();
+			contactSessionUser.setUserId(contactId);
+			contactSessionUser.setContactId(applyUserId);
+			contactSessionUser.setSessionId(sessionId);
+			UserInfo applyUserInfo = this.userInfoMapper.selectByUserId(applyUserId);
+			contactSessionUser.setContactName(applyUserInfo.getNickName());
+			chatSessionUserList.add(contactSessionUser);
+			this.chatSessionUserMapper.insertOrUpdateBatch(chatSessionUserList);
+
+			//记录消息表
+			ChatMessage chatMessage = new ChatMessage();
+			chatMessage.setSessionId(sessionId);
+			chatMessage.setMessageType(MessageTypeEnum.ADD_FRIEND.getType());
+			chatMessage.setMessageContent(applyInfo);
+			chatMessage.setSendUserId(applyUserId);
+			chatMessage.setSendUserNickname(applyUserInfo.getNickName());
+			chatMessage.setSendTime(curDate.getTime());
+			chatMessage.setContactId(contactId);
+			chatMessage.setContactType(UserContactTypeEnum.USER.getType());
+			this.chatMessageMapper.insert(chatMessage);
+
+			MessageSendDto messageSendDto =CopyTools.copy(chatMessage, MessageSendDto.class);
+			//发送给接受好友申请的人
+			messageHandler.sendMessage(messageSendDto);
+			//发送给申请人，发送人就是接收人，联系人就是申请人
+			messageSendDto.setMessageType(MessageTypeEnum.ADD_FRIEND.getType());
+			messageSendDto.setContactId(applyUserId);
+			messageSendDto.setExtendData(contactUser);
+			messageHandler.sendMessage(messageSendDto);
+		}else{
+			//加入群组
+			ChatSessionUser chatSessionUser = new ChatSessionUser();
+			chatSessionUser.setUserId(applyUserId);
+			chatSessionUser.setContactId(contactId);
+			GroupInfo groupInfo = this.groupInfoMapper.selectByGroupId(contactId);
+			chatSessionUser.setContactId(groupInfo.getGroupId());
+			chatSessionUser.setSessionId(sessionId);
+			this.chatSessionUserMapper.insert(chatSessionUser);
+
+
+			UserInfo applyUserInfo = this.userInfoMapper.selectByUserId(applyUserId);
+			String senMessage = String.format(MessageTypeEnum.ADD_GROUP.getInitMessage(),applyUserInfo.getNickName());
+
+			//增加session信息
+			ChatSession chatSession = new ChatSession();
+			chatSession.setSessionId(sessionId);
+			chatSession.setLastReceiveTime(curDate.getTime());
+			chatSession.setLastMessage(senMessage);
+			this.chatSessionMapper.insertOrUpdate(chatSession);
+
+			//增加聊天消息
+			ChatMessage chatMessage = new ChatMessage();
+			chatMessage.setSessionId(sessionId);
+			chatMessage.setMessageType(MessageTypeEnum.ADD_GROUP.getType());
+			chatMessage.setMessageContent(senMessage);
+			chatMessage.setSendTime(curDate.getTime());
+			chatMessage.setContactId(contactId);
+			chatMessage.setContactType(UserContactTypeEnum.GROUP.getType());
+			chatMessage.setStatus(MessageStatusEnum.SENT.getStatus());
+			this.chatMessageMapper.insert(chatMessage);
+
+			redisComponent.addUserContact(applyUserId,groupInfo.getGroupId());
+
+			channelContextUtils.addUser2Group(applyUserId,groupInfo.getGroupId());
+
+			//发送消息
+			MessageSendDto messageSendDto =CopyTools.copy(chatMessage, MessageSendDto.class);
+			messageSendDto.setContactId(contactId);
+			//获取群人数
+			UserContactQuery userContactQuery = new UserContactQuery();
+			userContactQuery.setContactId(contactId);
+			userContactQuery.setStatus(UserContactStatusEnum.FRIEND.getStatus());
+			Integer memberCount = this.userContactMapper.selectCount(userContactQuery);
+			messageSendDto.setMemberCount(memberCount);
+			messageSendDto.setContactName(groupInfo.getGroupName());
+			//发消息
+			messageHandler.sendMessage(messageSendDto);
+
+		}
 	}
 
 	@Override
@@ -345,5 +383,54 @@ public class UserContactServiceImpl implements UserContactService {
 		userContactMapper.updateByUserIdAndContactId(friendContact,contactId,userId);
 		//TODO 从我的好友列表中删除好友
 		//TODO 从好友列表缓存中删除我
+	}
+
+	@Override
+	@Transactional(rollbackFor = BusinessException.class)
+	public void addContact4Robot(String userId) {
+		Date curDate = new Date();
+		SysSettingDto sysSettingDto = redisComponent.getSysSettingDto();
+		String contactId = sysSettingDto.getRobotUid();
+		String contactName = sysSettingDto.getRobotNickName();
+		String sendMessage = sysSettingDto.getRobotWelcome();
+		sendMessage = StringTools.cleanHtmlTag(sendMessage);
+		//添加机器人为好友
+		UserContact userContact = new UserContact();
+		userContact.setUserId(userId);
+		userContact.setContactId(contactId);
+		userContact.setContactType(UserContactTypeEnum.USER.getType());
+		userContact.setCreateTime(curDate);
+		userContact.setLastUpdateTime(curDate);
+		userContact.setStatus(UserContactStatusEnum.FRIEND.getStatus());
+		userContactMapper.insertOrUpdate(userContact);
+		//增加会话信息
+		String sessionId = StringTools.getChatISessionID4User(new String[]{contactId,userId});
+		ChatSession chatSession = new ChatSession();
+		chatSession.setLastMessage(sendMessage);
+		chatSession.setSessionId(sessionId);
+		chatSession.setLastReceiveTime(curDate.getTime());
+		this.chatSessionMapper.insert(chatSession);
+
+		//增加会话人信息
+		ChatSessionUser chatSessionUser =  new ChatSessionUser();
+		chatSessionUser.setUserId(userId);
+		chatSessionUser.setContactId(contactId);
+		chatSessionUser.setContactName(contactName);
+		chatSessionUser.setSessionId(sessionId);
+		this.chatSessionUserMapper.insert(chatSessionUser);
+
+		//增加聊天消息
+		ChatMessage chatMessage = new ChatMessage();
+		chatMessage.setSessionId(sessionId);
+		chatMessage.setMessageType(MessageTypeEnum.CHAT.getType());
+		chatMessage.setMessageContent(sendMessage);
+		chatMessage.setSendUserId(contactId);
+		chatMessage.setSendUserNickname(contactName);
+		chatMessage.setSendTime(curDate.getTime());
+		chatMessage.setContactId(userId);
+		chatMessage.setContactType(UserContactTypeEnum.USER.getType());
+		chatMessage.setStatus(MessageStatusEnum.SENDING.getStatus());
+		chatMessageMapper.insert(chatMessage);
+
 	}
 }

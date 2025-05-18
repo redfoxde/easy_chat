@@ -3,10 +3,13 @@ import com.easychat.entity.constants.constants;
 import com.easychat.entity.enums.UserContactTypeEnum;
 import com.easychat.exception.BusinessException;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.DigestUtils;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 
 
 public class StringTools {
@@ -79,8 +82,28 @@ public class StringTools {
     /**
      * MD5加密
      */
-    public static  final String encodeMd5(String OriginString) {
+    public static final String encodeMd5(String OriginString) {
         return StringTools.isEmpty(OriginString)?null: DigestUtils.md5DigestAsHex(OriginString.getBytes());
+
+    }
+
+    public static String cleanHtmlTag(String content){
+        if (isEmpty(content)) {
+            return content;
+        }
+        content = content.replace("<", "&lt;");
+        content = content.replace("\r\t", "<br>");
+        content = content.replace("\n", "<br>");
+        return content;
+    }
+
+    public static final String getChatISessionID4User(String[] userIds){
+        Arrays.sort(userIds);
+        return encodeMd5(StringUtils.join(userIds+""));
+
+    }
+    public static final String getChatISessionID4Group(String groupId){
+        return encodeMd5(groupId);
 
     }
 }

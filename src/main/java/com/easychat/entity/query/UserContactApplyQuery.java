@@ -58,6 +58,16 @@ public class UserContactApplyQuery extends BaseParam {
 
 	private boolean queryContactInfo;
 
+	private Long lastApplyTimeStamp;
+
+	public Long getLastApplyTimeStamp() {
+		return lastApplyTimeStamp;
+	}
+
+	public void setLastApplyTimeStamp(Long lastApplyTimeStamp) {
+		this.lastApplyTimeStamp = lastApplyTimeStamp;
+	}
+
 	public void setQueryContactInfo(boolean queryContactInfo) {
 		this.queryContactInfo = queryContactInfo;
 	}

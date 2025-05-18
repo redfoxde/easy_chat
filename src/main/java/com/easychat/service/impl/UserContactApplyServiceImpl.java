@@ -6,18 +6,26 @@ import java.util.List;
 import javax.annotation.Resource;
 
 
+import com.easychat.entity.constants.constants;
+import com.easychat.entity.dto.MessageSendDto;
+import com.easychat.entity.dto.TokenUserInfoDto;
 import com.easychat.entity.enums.*;
+import com.easychat.entity.po.GroupInfo;
 import com.easychat.entity.po.UserContact;
-import com.easychat.entity.query.UserContactQuery;
+import com.easychat.entity.po.UserInfo;
+import com.easychat.entity.query.*;
 import com.easychat.exception.BusinessException;
+import com.easychat.mappers.GroupInfoMapper;
 import com.easychat.mappers.UserContactMapper;
+import com.easychat.mappers.UserInfoMapper;
+import com.easychat.service.GroupInfoService;
 import com.easychat.service.UserContactService;
+import com.easychat.websocket.netty.MessageHandler;
+import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.stereotype.Service;
 
-import com.easychat.entity.query.UserContactApplyQuery;
 import com.easychat.entity.po.UserContactApply;
 import com.easychat.entity.vo.PaginationResultVO;
-import com.easychat.entity.query.SimplePage;
 import com.easychat.mappers.UserContactApplyMapper;
 import com.easychat.service.UserContactApplyService;
 import com.easychat.utils.StringTools;
@@ -38,6 +46,17 @@ public class UserContactApplyServiceImpl implements UserContactApplyService {
 
     @Resource
     private UserContactService userContactService;
+
+	@Resource
+	private MessageHandler messageHandler;
+
+
+	@Resource
+	private GroupInfoMapper<GroupInfo, GroupInfoQuery> groupInfoMapper;
+
+	@Resource
+	private UserInfoMapper<UserInfo, UserInfoQuery> userInfoMapper;
+
 
 	/**
 	 * 根据条件查询列表
@@ -174,7 +193,7 @@ public class UserContactApplyServiceImpl implements UserContactApplyService {
 			throw new BusinessException(ResponseCodeEnum.CODE_600);
 		}
 		UserContactApply applyInfo = this.userContactApplyMapper.selectByApplyId(applyId);
-		if(applyInfo==null|| !userId.equals(applyInfo.getApplyUserId())) {
+		if(applyInfo==null|| !userId.equals(applyInfo.getReceiveUserId())) {
 			throw new BusinessException(ResponseCodeEnum.CODE_600);
 		}
 		UserContactApply updateInfo = new UserContactApply();
@@ -211,6 +230,90 @@ public class UserContactApplyServiceImpl implements UserContactApplyService {
 		}
 	}
 
+	/**
+	 * 添加好友
+	 */
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public Integer applyAdd(TokenUserInfoDto tokenUserInfoDto, String contactId, String applyInfo) {
+		UserContactTypeEnum typeEnum = UserContactTypeEnum.getByPrefix(contactId);
+		if (typeEnum == null) {
+			throw new BusinessException(ResponseCodeEnum.CODE_600);
+		}
+		//申请人信息
+		String applyUserId = tokenUserInfoDto.getUserId();
+
+		//默认信息
+		applyInfo = StringTools.isEmpty(applyInfo)?String.format(constants.APPLY_INFO_TEMPLATE,tokenUserInfoDto.getNickName()): applyInfo;
+
+		Long curTime = System.currentTimeMillis();
+
+		Integer joinType = null;
+		String receiveUserId = contactId;
+
+		//查询对方好友是否添加，如果已拉黑则无法添加
+		UserContact userContact = userContactMapper.selectByUserIdAndContactId(applyUserId, contactId);
+		if (userContact != null&&
+				ArrayUtils.contains(new Integer[]{
+						UserContactStatusEnum.BLACKLIST_BE.getStatus(),
+						UserContactStatusEnum.BLACKLIST_BE_FIRST.getStatus(),
+				},userContact.getStatus())
+		) {
+			throw new BusinessException("对方已将你拉黑");
+		}
+
+		//加群
+		if(UserContactTypeEnum.GROUP.equals(typeEnum)){
+			GroupInfo groupInfo = groupInfoMapper.selectByGroupId(contactId);
+			if (groupInfo == null|| GroupStatusEnum.DISSOLUTION.getStatus().equals(groupInfo.getStatus())) {
+				throw new BusinessException("群聊不存在或已解散");
+			}
+			receiveUserId = groupInfo.getGroupId();
+			joinType = groupInfo.getJoinType();
+		}else {
+			UserInfo userInfo = userInfoMapper.selectByUserId(contactId);
+			if (userInfo == null) {
+				throw new BusinessException(ResponseCodeEnum.CODE_600);
+			}
+			joinType = userInfo.getJoinType();
+		}
+
+		//直接加入不用申请记录
+		if(JoinTypeEnum.JOIN.getType().equals(joinType)){
+			userContactService.addContact(applyUserId,receiveUserId,contactId,typeEnum.getType(),applyInfo);
+
+			return joinType;
+		}
+
+		UserContactApply dbApply = this.userContactApplyMapper.selectByApplyUserIdAndReceiveUserIdAndContactId(applyUserId, receiveUserId, contactId);
+		if(dbApply == null){
+			UserContactApply contactApply = new UserContactApply();
+			contactApply.setApplyUserId(applyUserId);
+			contactApply.setContactType(typeEnum.getType());
+			contactApply.setReceiveUserId(receiveUserId);
+			contactApply.setLastApplyTime(curTime);
+			contactApply.setContactId(contactId);
+			contactApply.setStatus(UserContactApplyStatusEnum.INIT.getStatus());
+			contactApply.setApplyInfo(applyInfo);
+			this.userContactApplyMapper.insert(contactApply);
+		}else{
+			//更新状态
+			UserContactApply contactApply = new UserContactApply();
+			contactApply.setStatus(UserContactApplyStatusEnum.INIT.getStatus());
+			contactApply.setApplyUserId(applyUserId);
+			contactApply.setApplyInfo(applyInfo);
+			this.userContactApplyMapper.updateByApplyId(contactApply,dbApply.getApplyId());
+		}
+		if(dbApply == null||!dbApply.getStatus().equals(UserContactApplyStatusEnum.INIT.getStatus())){
+			MessageSendDto messageSendDto = new MessageSendDto();
+			messageSendDto.setMessageType(MessageTypeEnum.CONTACT_APPLY.getType());
+			messageSendDto.setMessageContent(applyInfo);
+			messageSendDto.setContactId(receiveUserId);
+			messageHandler.sendMessage(messageSendDto);
+		}
+
+		return joinType;
+	}
 
 
 }

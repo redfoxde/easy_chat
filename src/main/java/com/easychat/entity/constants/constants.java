@@ -47,9 +47,11 @@ public class constants {
 
     public static final String APPLY_INFO_TEMPLATE = "我是%s";
 
-    public static final String REGEX_PASSWORD = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[!@#$%^&*()_+])[A-Za-z\\d!@#$%^&*()_+]{8,12}$";
+    public static final String REGEX_PASSWORD = "^(?=.*[a-zA-Z])(?=.*\\d)[\\w!@#$%^&*()-+]{8,16}$";
 
     //用户联系人列表
     public static final String REDIS_KEY_USER_CONTACT = "easychat:ws:user:contact";
+
+    public static final Long MILLIS_SECONDS_3DAYS_AGO = 3 *24*60*60*1000L ;
 
 }

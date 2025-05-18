@@ -23,9 +23,13 @@ import com.easychat.exception.BusinessException;
 import com.easychat.mappers.UserContactMapper;
 import com.easychat.mappers.UserInfoBeautyMapper;
 import com.easychat.redis.RedisComponent;
+import com.easychat.service.UserContactService;
 import com.easychat.utils.CopyTools;
+import com.easychat.websocket.netty.HandlerWebSocket;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.ibatis.reflection.ArrayUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.couchbase.CouchbaseProperties;
 import org.springframework.stereotype.Service;
@@ -46,6 +50,8 @@ import org.springframework.web.multipart.MultipartFile;
 @Service("userInfoService")
 public class UserInfoServiceImpl implements UserInfoService {
 
+	private static final Logger logger = LoggerFactory.getLogger(UserInfoServiceImpl.class);
+
 	@Resource
 	private UserInfoMapper<UserInfo, UserInfoQuery> userInfoMapper;
 
@@ -54,10 +60,17 @@ public class UserInfoServiceImpl implements UserInfoService {
 
 	@Resource
 	private AppConfig appConfig;
-    @Autowired
+
+
+    @Resource
     private RedisComponent redisComponent;
-    @Autowired
-    private UserContactMapper userContactMapper;
+
+
+    @Resource
+    private UserContactMapper<UserContact,UserContactQuery> userContactMapper;
+
+	@Resource
+	private UserContactService userContactService;
 
 	/**
 	 * 根据条件查询列表
@@ -193,6 +206,8 @@ public class UserInfoServiceImpl implements UserInfoService {
 	@Transactional(rollbackFor = Exception.class)
 	public void register(String email, String nickName, String password) {
 		UserInfo userInfo = this.userInfoMapper.selectByEmail(email);
+		logger.debug("注册密码哈希: {}", StringTools.encodeMd5(password));
+
 		if(null!=userInfo) {
 			throw new BusinessException("邮箱已存在");
 		}
@@ -221,16 +236,18 @@ public class UserInfoServiceImpl implements UserInfoService {
 				updateBeauty.setStatus(BeautyAccountStatusEnum.USE.getStatus());
 				this.userInfoBeautyMapper.updateByUserId(updateBeauty,beautyAccount.getUserId());
 			}
-			//TODO 创建机器人好友
+
+			userContactService.addContact4Robot(userId);
     }
 
 	/**
 	 *登录
 	 */
+	@Override
 	public UserInfoVO login(String email, String password){
 		UserInfo userInfo = this.userInfoMapper.selectByEmail(email);
 
-		if(null==userInfo||!userInfo.getPassword().equals(StringTools.encodeMd5(password))) {
+		if(null==userInfo||!userInfo.getPassword().equals(password)) {
 			throw new BusinessException("账号或密码不正确");
 		}
 
