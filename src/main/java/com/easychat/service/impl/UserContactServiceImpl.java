@@ -251,7 +251,7 @@ public class UserContactServiceImpl implements UserContactService {
 			contactList.add(userContact);
 		}
 		//批量插入
-		userContactMapper.insertOrUpdate(userContact);
+		userContactMapper.insertOrUpdateBatch(contactList);
 
 		if(UserContactTypeEnum.USER.getType().equals(contactType)){
 			redisComponent.addUserContact(receiveUserId,applyUserId);
